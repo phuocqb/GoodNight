@@ -1,11 +1,13 @@
-package ru.pisklenov.android.GoodNight.activity;
+package ru.pisklenov.android.GoodNight;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -17,6 +19,7 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -25,17 +28,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import ru.pisklenov.android.GoodNight.GN;
-import ru.pisklenov.android.GoodNight.R;
-import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
-import ru.pisklenov.android.GoodNight.util.BitmapHelper;
-import ru.pisklenov.android.GoodNight.util.Player;
-import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
-import ru.pisklenov.android.GoodNight.util.Track;
-import ru.pisklenov.android.GoodNight.util.TrackList;
-import ru.pisklenov.android.GoodNight.util.WallpaperList;
+import java.util.prefs.Preferences;
 
-public class MainActivity extends Activity {
+public class MyActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     //RelativeLayout relativeLayoutBack;
 
@@ -52,16 +47,11 @@ public class MainActivity extends Activity {
     TextView textViewOffTimer;
 
     ProgressBar progressBar;
+
     TrackList trackList;
     Player player;
-
     UpdateTrackPosTask updateTrackPosTask;
     UpdateWallpapers updateWallpapersTask;
-    OffTimerTask offTimerTask;
-
-    ListenToPhoneState listener;
-
-    PreferencesHelper preferencesHelper;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,7 +65,9 @@ public class MainActivity extends Activity {
     public void onStop() {
         super.onStop();
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onStop()");
+        if (DEBUG) Log.w(GN.TAG, "MyActivity.onStop()");
+
+        //player.release();
     }
 
     @Override
@@ -88,7 +80,7 @@ public class MainActivity extends Activity {
     public void onPause() {
         super.onPause();
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onPause()");
+        if (DEBUG) Log.w(GN.TAG, "MyActivity.onPause()");
 
         if (updateTrackPosTask != null) {
             updateTrackPosTask.cancel(true);
@@ -103,13 +95,12 @@ public class MainActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onResume()");
+        if (DEBUG) Log.w(GN.TAG, "MyActivity.onResume()");
         /*if (saveThisObjects != null && saveThisObjects.updateTrackPosTask != null) {
             updateTrackPosTask = saveThisObjects.updateTrackPosTask;
         } else {
             updateTrackPosTask = new UpdateTrackPosTask();
         }*/
-
         updateTrackPosTask = new UpdateTrackPosTask();
         updateTrackPosTask.execute();
 
@@ -117,6 +108,8 @@ public class MainActivity extends Activity {
         updateWallpapersTask = new UpdateWallpapers();
         updateWallpapersTask.execute();
     }
+
+    ListenToPhoneState listener;
 
     /**
      * Called when the activity is first created.
@@ -126,13 +119,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onCreate()");
-
-        // create preferences class
-        preferencesHelper = new PreferencesHelper(MainActivity.this);
+        if (DEBUG) Log.w(GN.TAG, "MyActivity.onCreate()");
 
 
-        // set min volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -144,10 +133,9 @@ public class MainActivity extends Activity {
         Log.d(GN.TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
 
-
-        /*TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+        TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         listener = new ListenToPhoneState();
-        tManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);*/
+        tManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);
         //relativeLayoutBack = (RelativeLayout) findViewById(R.id.relativeLayoutBody);
 
         imageViewWallpaper = (ImageView) findViewById(R.id.imageViewWallpaper);
@@ -168,7 +156,7 @@ public class MainActivity extends Activity {
         imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
 
 
-        imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhoneControl);
+        imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhone);
         imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
 
 
@@ -192,7 +180,7 @@ public class MainActivity extends Activity {
         if (saveThisObjects != null && saveThisObjects.player != null) {
             player = saveThisObjects.player;
         } else {
-            player = new Player(MainActivity.this);
+            player = new Player(MyActivity.this);
             Track track = trackList.getCurrentTrack();
             player.createPlayer(track);
 
@@ -215,6 +203,7 @@ public class MainActivity extends Activity {
 
     }
 
+
     @Override
     public Object onRetainNonConfigurationInstance() {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
@@ -227,28 +216,18 @@ public class MainActivity extends Activity {
         return saveThisObjects;
     }
 
+    OffTimerTask offTimerTask;
+
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-
         MenuInflater inflater = getMenuInflater();
-
-
-        switch (v.getId()) {
-            case R.id.buttonTimer:
-                Log.i(GN.TAG, "THIS IS buttonTimer");
-                break;
-            case R.id.buttonPhoneControl:
-                Log.i(GN.TAG, "THIS IS buttonPhoneControl");
-                break;
-        }
-
 
         Log.d(GN.TAG, "onCreateContextMenu");
         inflater.inflate(R.menu.off_timer, menu);
     }
 
-/*
+
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
@@ -278,7 +257,7 @@ public class MainActivity extends Activity {
             default:
                 return super.onContextItemSelected(item);
         }
-    }*/
+    }
 
     class OffTimerTask extends AsyncTask<Void, Void, Void> {
         int secondCounter; // ony seconds
@@ -361,6 +340,7 @@ public class MainActivity extends Activity {
 
     class UpdateWallpapers extends AsyncTask<Void, Void, Void> {
         static final int CHANGE_WALLPAPER_PERIOD = 10; // 10 second
+
         int secCounter = 0;
         int prevResID = 0;
 
@@ -388,7 +368,7 @@ public class MainActivity extends Activity {
             int newWallpaperID = WallpaperList.getRandWallpaperID(prevResID);
 
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), newWallpaperID);
-            BitmapHelper.ImageViewAnimatedChange(MainActivity.this, imageViewWallpaper, bitmap);
+            BitmapHelper.ImageViewAnimatedChange(MyActivity.this, imageViewWallpaper, bitmap);
 
             prevResID = newWallpaperID;
         }
@@ -397,59 +377,9 @@ public class MainActivity extends Activity {
     class ButtonTimerOnClickListener implements Button.OnClickListener {
         @Override
         public void onClick(View view) {
-            IconContextMenu cm = new IconContextMenu(MainActivity.this, R.menu.off_timer);
-            cm.setTitle(R.string.menu_timer_off_title);
-            cm.setOnIconContextItemSelectedListener(new TimerIconContextMenuSelectedListener());
-            cm.show();
-        }
-    }
-
-    class PhoneControlIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
-        @Override
-        public void onIconContextItemSelected(MenuItem item, Object info) {
-            Log.d(GN.TAG, "onContextItemSelected");
-
-            switch (item.getItemId()) {
-                case R.id.phone_control_mute_on:
-                    //
-                    break;
-                case R.id.phone_control_mute_off:
-
-                    break;
-
-                default: ;
-            }
-        }
-    }
-
-    class TimerIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
-        @Override
-        public void onIconContextItemSelected(MenuItem item, Object info) {
-            Log.d(GN.TAG, "onContextItemSelected");
-
-            if (offTimerTask != null) {
-                offTimerTask.cancel(true);
-                textViewOffTimer.setVisibility(View.INVISIBLE);
-            }
-
-            switch (item.getItemId()) {
-                case R.id.timer_off:
-                    //
-                    break;
-                case R.id.timer_10:
-                    offTimerTask = new OffTimerTask(60);
-                    offTimerTask.execute();
-                    break;
-                case R.id.timer_20:
-                    offTimerTask = new OffTimerTask(120);
-                    offTimerTask.execute();
-                    break;
-                case R.id.timer_30:
-                    offTimerTask = new OffTimerTask(180);
-                    offTimerTask.execute();
-                    break;
-                default: ;
-            }
+            registerForContextMenu(view);
+            openContextMenu(view);
+            unregisterForContextMenu(view);
         }
     }
 
@@ -503,24 +433,43 @@ public class MainActivity extends Activity {
         }
     }
 
+    /*private class ImageButtonHighlightOnTouchListener implements View.OnTouchListener {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                //grey color filter, you can change the color as you like
+                ((ImageButton) view).setColorFilter(Color.argb(155, 53, 93, 255));
+            } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                ((ImageButton) view).setColorFilter(Color.argb(0, 53, 93, 255));
+            }
+            return false;
+        }
+    }*/
+
+
+    class SaveThisObjects {
+        public Player player;
+        public UpdateTrackPosTask updateTrackPosTask;
+        public OffTimerTask offTimerTask;
+        public TrackList trackList;
+    }
+
     class ButtonPhoneControlOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            IconContextMenu cm = new IconContextMenu(MainActivity.this, R.menu.phone_control);
-            cm.setTitle(R.string.menu_phone_control_title);
-            cm.setOnIconContextItemSelectedListener(new PhoneControlIconContextMenuSelectedListener());
-            cm.show();
+            Intent settingsActivity = new Intent(getBaseContext(), PhoneControlPrefActivity.class);
+            startActivity(settingsActivity);
         }
     }
 
     class ButtonShowTrackListOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
+            AlertDialog.Builder builderSingle = new AlertDialog.Builder(MyActivity.this);
             //builderSingle.setIcon(R.drawable.ic_launcher);
             builderSingle.setTitle(R.string.select_track);
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                    MainActivity.this, android.R.layout.select_dialog_singlechoice);
+                    MyActivity.this, android.R.layout.select_dialog_singlechoice);
 
             for (Track track : trackList.getTracks()) {
                 arrayAdapter.add(track.title);
@@ -571,6 +520,7 @@ public class MainActivity extends Activity {
                     audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
                     break;
             }
+
         }
 
         String stateName(int state) {
@@ -581,12 +531,5 @@ public class MainActivity extends Activity {
             }
             return Integer.toString(state);
         }
-    }
-
-    class SaveThisObjects {
-        public Player player;
-        public UpdateTrackPosTask updateTrackPosTask;
-        public OffTimerTask offTimerTask;
-        public TrackList trackList;
     }
 }
