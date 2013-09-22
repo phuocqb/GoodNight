@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:id="@+id/relativeLayoutBody">
+
+    <ImageView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/imageViewWallpaper"
+        android:src="@drawable/wallpaper_1"
+        android:scaleType="centerCrop" />
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/title_background">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/buttonTrackList"
+            android:layout_alignParentRight="false"
+            android:layout_alignParentLeft="true"
+            android:background="@drawable/list2" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="New Text"
+            android:id="@+id/textViewTitle"
+            android:layout_alignParentLeft="false"
+            android:layout_alignParentBottom="false"
+            android:layout_alignWithParentIfMissing="false"
+            android:layout_alignParentTop="false"
+            android:layout_alignParentRight="false"
+            android:textSize="18sp"
+            android:layout_toRightOf="@+id/buttonTrackList"
+            android:layout_centerVertical="true"
+            android:textColor="@color/title_color" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="4dp"
+            android:id="@+id/progressBar"
+            android:layout_alignParentBottom="false"
+            android:layout_margin="5dp"
+            android:layout_alignBottom="@+id/buttonTrackList"
+            android:layout_toRightOf="@+id/buttonTrackList" />
+
+    </RelativeLayout>
+
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/buttonTimer"
+        android:layout_above="@+id/textViewOffTimer"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/button_background_selector"
+        android:src="@drawable/clock"
+        android:scaleType="fitXY" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonPlay"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_background_selector"
+        android:src="@drawable/play" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonNext"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@+id/buttonPlay"
+        android:background="@drawable/button_background_selector"
+        android:src="@drawable/next" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/buttonPrev"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@+id/buttonPlay"
+        android:background="@drawable/button_background_selector"
+        android:src="@drawable/previous" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/textViewOffTimer"
+        android:layout_above="@+id/buttonNext"
+        android:layout_alignParentRight="true"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:id="@+id/buttonPhoneControl"
+        android:background="@drawable/button_background_selector"
+        android:src="@drawable/phone_mute"
+        android:scaleType="fitXY"
+        android:layout_alignTop="@+id/buttonTimer" />
+
+</RelativeLayout>
+
+

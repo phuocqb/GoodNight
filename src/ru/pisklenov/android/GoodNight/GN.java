@@ -1,0 +1,11 @@
+package ru.pisklenov.android.GoodNight;
+
+import android.app.Application;
+
+/**
+ * Created by anpi0413 on 09.09.13.
+ */
+public class GN extends Application {
+    public static final String TAG = "GoodNight";
+    public static final boolean DEBUG = true;
+}

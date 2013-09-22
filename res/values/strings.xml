@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GoodNight</string>
+
+    <string name="button_play">Play</string>
+    <string name="button_pause">Pause</string>
+    <string name="button_next">Next</string>
+    <string name="button_prev">Prev</string>
+
+    <string name="timer_off">Off</string>
+    <string name="timer_10">Turn off after 10 min</string>
+    <string name="timer_20">Turn off after 20 min</string>
+    <string name="timer_30">Turn off after 30 min</string>
+
+    <string name="select_track">Select track</string>
+
+    <string name="cancel">Cancel</string>
+
+    <string name="menu_about_title">About</string>
+    <string name="menu_about">This is me-me-me application :3 </string>
+
+    <string name="menu_phone_control_title">What me do with incoming calls</string>
+    <string name="menu_timer_off_title">Create timer</string>
+
+    <string name="phone_control_mute_on">Mute incoming calls</string>
+    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling</string>
+</resources>

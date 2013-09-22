@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/off"
+        android:id="@+id/timer_off"
+        android:title="@string/timer_off"/>
+
+    <item
+        android:icon="@drawable/clock_help"
+        android:id="@+id/timer_10"
+        android:title="@string/timer_10" />
+
+    <item
+        android:icon="@drawable/clock_help"
+        android:id="@+id/timer_20"
+        android:title="@string/timer_20" />
+
+    <item
+        android:icon="@drawable/clock_help"
+        android:id="@+id/timer_30"
+        android:title="@string/timer_30" />
+</menu>
