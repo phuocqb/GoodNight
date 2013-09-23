@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
@@ -19,7 +18,6 @@ import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,8 +25,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import java.util.prefs.Preferences;
 
 public class MyActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
@@ -156,7 +152,7 @@ public class MyActivity extends Activity {
         imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
 
 
-        imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhone);
+        imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhoneControl);
         imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
 
 
