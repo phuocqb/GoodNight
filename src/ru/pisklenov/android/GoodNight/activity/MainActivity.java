@@ -23,6 +23,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.InstanceState;
+import com.googlecode.androidannotations.annotations.ViewById;
+
 import java.util.concurrent.TimeUnit;
 
 import ru.pisklenov.android.GoodNight.GN;
@@ -36,24 +41,39 @@ import ru.pisklenov.android.GoodNight.util.Track;
 import ru.pisklenov.android.GoodNight.util.TrackList;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
+@EActivity (R.layout.main)
 public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
+    @ViewById (R.id.buttonPlay)
     ImageButton imageButtonPlay;
+    @ViewById (R.id.buttonNext)
     ImageButton imageButtonNext;
+    @ViewById (R.id.buttonPrev)
     ImageButton imageButtonPrev;
+    @ViewById (R.id.buttonTimer)
     ImageButton imageButtonTimer;
+    @ViewById (R.id.buttonTrackList)
     ImageButton imageButtonTrackList;
+    @ViewById (R.id.buttonPhoneControl)
     ImageButton imageButtonPhoneControl;
 
+    @ViewById (R.id.imageViewWallpaper)
     ImageView imageViewWallpaper;
 
+    @ViewById (R.id.textViewTitle)
     TextView textViewTitle;
+
+    @ViewById (R.id.textViewOffTimer)
     TextView textViewOffTimer;
 
+    @ViewById (R.id.progressBar)
     ProgressBar progressBar;
+
+    @InstanceState
     TrackList trackList;
+    @InstanceState
     Player player;
 
     UpdateTrackPosTask updateTrackPosTask;
@@ -86,11 +106,16 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onBackPressed() {
+    protected void onDestroy() {
+        super.onDestroy();
+
         if (player != null) {
             player.release();
         }
+    }
 
+    @Override
+    public void onBackPressed() {
         finish();
     }
 
@@ -100,12 +125,12 @@ public class MainActivity extends Activity {
 
         if (DEBUG) Log.w(TAG, "MainActivity.onPause()");
 
-        if (updateTrackPosTask != null && !updateTrackPosTask.isCancelled()) {
+        if (updateTrackPosTask != null) {
             updateTrackPosTask.cancel(true);
             updateTrackPosTask = null;
         }
 
-        if (updateWallpapersTask != null && !updateWallpapersTask.isCancelled()) {
+        if (updateWallpapersTask != null) {
             updateWallpapersTask.cancel(true);
             updateWallpapersTask = null;
         }
@@ -145,62 +170,22 @@ public class MainActivity extends Activity {
 
         }
 
-
         // set min volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) Math.round(maxVolume * 0.2), 0);
-        //audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
         Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
         Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
-        /*TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        listener = new ListenToPhoneState();
-        tManager.listen(listener, PhoneStateListener.LISTEN_CALL_STATE);*/
-        //relativeLayoutBack = (RelativeLayout) findViewById(R.id.relativeLayoutBody);
-
-        imageViewWallpaper = (ImageView) findViewById(R.id.imageViewWallpaper);
-
-        imageButtonTimer = (ImageButton) findViewById(R.id.buttonTimer);
-        imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
-
-        imageButtonPlay = (ImageButton) findViewById(R.id.buttonPlay);
-        imageButtonPlay.setOnClickListener(new ButtonPlayOnClickListener());
-
-        imageButtonNext = (ImageButton) findViewById(R.id.buttonNext);
-        imageButtonNext.setOnClickListener(new ButtonNextOnClickListener());
-
-        imageButtonPrev = (ImageButton) findViewById(R.id.buttonPrev);
-        imageButtonPrev.setOnClickListener(new ButtonPrevOnClickListener());
-
-        imageButtonTrackList = (ImageButton) findViewById(R.id.buttonTrackList);
-        imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
-
-
-        imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhoneControl);
-        imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
-
-
-        textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
-
-
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setMax(100);
-
         SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
-
         if (saveThisObjects != null && saveThisObjects.trackList != null) {
             trackList = saveThisObjects.trackList;
         } else {
             trackList = new TrackList(0);
         }
-
-        textViewTitle = (TextView) findViewById(R.id.textViewTitle);
-        textViewTitle.setText(trackList.getCurrentTrack().title);
 
         if (saveThisObjects != null && saveThisObjects.player != null) {
             player = saveThisObjects.player;
@@ -224,11 +209,41 @@ public class MainActivity extends Activity {
                 textViewTitle.setText(((Track) o).title);
             }
         });
-
-
     }
 
-    @Override
+    @AfterViews
+    void afterViews() {
+        //imageViewWallpaper = (ImageView) findViewById(R.id.imageViewWallpaper);
+
+        //imageButtonTimer = (ImageButton) findViewById(R.id.buttonTimer);
+        imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
+
+        //imageButtonPlay = (ImageButton) findViewById(R.id.buttonPlay);
+        imageButtonPlay.setOnClickListener(new ButtonPlayOnClickListener());
+
+        //imageButtonNext = (ImageButton) findViewById(R.id.buttonNext);
+        imageButtonNext.setOnClickListener(new ButtonNextOnClickListener());
+
+        //imageButtonPrev = (ImageButton) findViewById(R.id.buttonPrev);
+        imageButtonPrev.setOnClickListener(new ButtonPrevOnClickListener());
+
+        //imageButtonTrackList = (ImageButton) findViewById(R.id.buttonTrackList);
+        imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
+
+
+        //imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhoneControl);
+        imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
+
+        //progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setMax(100);
+
+        textViewTitle.setText(trackList.getCurrentTrack().title);
+    }
+
+
+
+
+    /*@Override
     public Object onRetainNonConfigurationInstance() {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
 
@@ -238,7 +253,7 @@ public class MainActivity extends Activity {
         saveThisObjects.trackList = trackList;
 
         return saveThisObjects;
-    }
+    }*/
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {

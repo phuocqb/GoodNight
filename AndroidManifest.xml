@@ -12,7 +12,8 @@
     <application android:label="@string/app_name"
         android:name=".GN">
 
-        <activity android:name=".activity.MainActivity"
+
+        <activity android:name=".activity.MainActivity_"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
