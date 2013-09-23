@@ -10,8 +10,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.telephony.PhoneStateListener;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -25,10 +23,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.concurrent.TimeUnit;
+
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
+import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
 import ru.pisklenov.android.GoodNight.util.Track;
@@ -37,7 +38,7 @@ import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
 public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
-    //RelativeLayout relativeLayoutBack;
+    private static final String TAG = GN.TAG;
 
     ImageButton imageButtonPlay;
     ImageButton imageButtonNext;
@@ -59,9 +60,11 @@ public class MainActivity extends Activity {
     UpdateWallpapers updateWallpapersTask;
     OffTimerTask offTimerTask;
 
-    ListenToPhoneState listener;
+    //ListenToPhoneState listener;
 
     PreferencesHelper preferencesHelper;
+    PhoneModeHelper phoneModeHelper;
+    int currentPhoneState;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -74,13 +77,20 @@ public class MainActivity extends Activity {
     @Override
     public void onStop() {
         super.onStop();
+        if (DEBUG) Log.w(TAG, "MainActivity.onStop()");
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onStop()");
+        // return default phone mode state
+        if (phoneModeHelper != null) {
+            phoneModeHelper.setMode(currentPhoneState);
+        }
     }
 
     @Override
     public void onBackPressed() {
-        player.release();
+        if (player != null) {
+            player.release();
+        }
+
         finish();
     }
 
@@ -88,14 +98,16 @@ public class MainActivity extends Activity {
     public void onPause() {
         super.onPause();
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onPause()");
+        if (DEBUG) Log.w(TAG, "MainActivity.onPause()");
 
-        if (updateTrackPosTask != null) {
+        if (updateTrackPosTask != null && !updateTrackPosTask.isCancelled()) {
             updateTrackPosTask.cancel(true);
+            updateTrackPosTask = null;
         }
 
-        if (updateWallpapersTask != null) {
+        if (updateWallpapersTask != null && !updateWallpapersTask.isCancelled()) {
             updateWallpapersTask.cancel(true);
+            updateWallpapersTask = null;
         }
     }
 
@@ -103,12 +115,7 @@ public class MainActivity extends Activity {
     public void onResume() {
         super.onResume();
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onResume()");
-        /*if (saveThisObjects != null && saveThisObjects.updateTrackPosTask != null) {
-            updateTrackPosTask = saveThisObjects.updateTrackPosTask;
-        } else {
-            updateTrackPosTask = new UpdateTrackPosTask();
-        }*/
+        if (DEBUG) Log.w(TAG, "MainActivity.onResume()");
 
         updateTrackPosTask = new UpdateTrackPosTask();
         updateTrackPosTask.execute();
@@ -126,24 +133,30 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        if (DEBUG) Log.w(GN.TAG, "MainActivity.onCreate()");
+        if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
 
         // create preferences class
         preferencesHelper = new PreferencesHelper(MainActivity.this);
 
+        // create control mode class
+        phoneModeHelper = new PhoneModeHelper(MainActivity.this);
+        currentPhoneState = phoneModeHelper.getCurrentMode();
+        if (currentPhoneState == PhoneModeHelper.MODE_SILENT) {
+
+        }
+
 
         // set min volume
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) Math.round(maxVolume * 0.2), 0);
         //audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
 
-        Log.d(GN.TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
-        Log.d(GN.TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
-
-
+        Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
+        Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
         /*TelephonyManager tManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         listener = new ListenToPhoneState();
@@ -220,8 +233,8 @@ public class MainActivity extends Activity {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
 
         saveThisObjects.player = player;
-        saveThisObjects.offTimerTask = offTimerTask;
-        saveThisObjects.updateTrackPosTask = updateTrackPosTask;
+        //saveThisObjects.offTimerTask = offTimerTask;
+        //saveThisObjects.updateTrackPosTask = updateTrackPosTask;
         saveThisObjects.trackList = trackList;
 
         return saveThisObjects;
@@ -236,49 +249,17 @@ public class MainActivity extends Activity {
 
         switch (v.getId()) {
             case R.id.buttonTimer:
-                Log.i(GN.TAG, "THIS IS buttonTimer");
+                Log.i(TAG, "THIS IS buttonTimer");
                 break;
             case R.id.buttonPhoneControl:
-                Log.i(GN.TAG, "THIS IS buttonPhoneControl");
+                Log.i(TAG, "THIS IS buttonPhoneControl");
                 break;
         }
 
-
-        Log.d(GN.TAG, "onCreateContextMenu");
+        Log.d(TAG, "onCreateContextMenu");
         inflater.inflate(R.menu.off_timer, menu);
     }
 
-/*
-
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        Log.d(GN.TAG, "onContextItemSelected");
-
-        if (offTimerTask != null) {
-            offTimerTask.cancel(true);
-            textViewOffTimer.setVisibility(View.INVISIBLE);
-        }
-
-        switch (item.getItemId()) {
-            case R.id.timer_off:
-                //
-                return true;
-            case R.id.timer_10:
-                offTimerTask = new OffTimerTask(60);
-                offTimerTask.execute();
-                return true;
-            case R.id.timer_20:
-                offTimerTask = new OffTimerTask(120);
-                offTimerTask.execute();
-                return true;
-            case R.id.timer_30:
-                offTimerTask = new OffTimerTask(180);
-                offTimerTask.execute();
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-    }*/
 
     class OffTimerTask extends AsyncTask<Void, Void, Void> {
         int secondCounter; // ony seconds
@@ -289,16 +270,16 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            while (!Thread.interrupted()) {
+            while (!isCancelled()) {
                 try {
-                    Thread.sleep(1000);
+                    publishProgress();
+                    secondCounter--;
+
+                    TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
+                    return null;
                 }
-
-                publishProgress();
-                secondCounter--;
             }
-
             return null;
         }
 
@@ -308,9 +289,11 @@ public class MainActivity extends Activity {
                 textViewOffTimer.setVisibility(View.VISIBLE);
             }
 
-            int min = secondCounter / 60;
-            int sec = secondCounter - 60 * min;
-            textViewOffTimer.setText(min + ":" + sec);
+            if (textViewOffTimer != null) {
+                int min = secondCounter / 60;
+                int sec = secondCounter - 60 * min;
+                textViewOffTimer.setText(min + ":" + sec);
+            }
         }
 
         @Override
@@ -331,26 +314,26 @@ public class MainActivity extends Activity {
     class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
-            while (!Thread.interrupted()) {
-                publishProgress();
-
+            while (!isCancelled()) {
                 try {
-                    Thread.sleep(1000);
+                    publishProgress();
+
+                    TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
+                    return null;
                 }
             }
-
             return null;
         }
 
         @Override
         protected void onProgressUpdate(Void... voids) {
-            if (Thread.interrupted()) return;
+            //if (Thread.interrupted()) return;
 
             if (player != null && player.isPlaying()) {
 
-                //Log.d(GN.TAG, String.valueOf(player.getCurrentPosition() + " " + player.getDuration()));
-                //Log.d(GN.TAG, String.valueOf(Math.round(((float)player.getCurrentPosition() / (float)player.getDuration()) * 100)));
+                //Log.d(TAG, String.valueOf(player.getCurrentPosition() + " " + player.getDuration()));
+                //Log.d(TAG, String.valueOf(Math.round(((float)player.getCurrentPosition() / (float)player.getDuration()) * 100)));
 
                 progressBar.setProgress(Math.round(((float) player.getCurrentPosition() / (float) player.getDuration()) * 100));
             } else {
@@ -366,20 +349,20 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            while (!Thread.interrupted()) {
+            while (!isCancelled()) {
                 try {
-                    Thread.sleep(1000);
+                    TimeUnit.SECONDS.sleep(1);
+
+                    secCounter++;
+
+                    if (secCounter >= CHANGE_WALLPAPER_PERIOD) {
+                        secCounter = 0;
+                        publishProgress();
+                    }
                 } catch (InterruptedException e) {
-                }
-
-                secCounter++;
-
-                if (secCounter >= CHANGE_WALLPAPER_PERIOD) {
-                    secCounter = 0;
-                    publishProgress();
+                    return null;
                 }
             }
-
             return null;
         }
 
@@ -407,7 +390,7 @@ public class MainActivity extends Activity {
     class PhoneControlIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
         @Override
         public void onIconContextItemSelected(MenuItem item, Object info) {
-            Log.d(GN.TAG, "onContextItemSelected");
+            Log.d(TAG, "onContextItemSelected");
 
             switch (item.getItemId()) {
                 case R.id.phone_control_mute_on:
@@ -417,7 +400,8 @@ public class MainActivity extends Activity {
 
                     break;
 
-                default: ;
+                default:
+                    ;
             }
         }
     }
@@ -425,7 +409,7 @@ public class MainActivity extends Activity {
     class TimerIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
         @Override
         public void onIconContextItemSelected(MenuItem item, Object info) {
-            Log.d(GN.TAG, "onContextItemSelected");
+            Log.d(TAG, "onContextItemSelected");
 
             if (offTimerTask != null) {
                 offTimerTask.cancel(true);
@@ -448,7 +432,8 @@ public class MainActivity extends Activity {
                     offTimerTask = new OffTimerTask(180);
                     offTimerTask.execute();
                     break;
-                default: ;
+                default:
+                    ;
             }
         }
     }
@@ -468,13 +453,13 @@ public class MainActivity extends Activity {
 
                 ((ImageView) view).setImageResource(R.drawable.play);
                 //view.setBackgroundResource(R.drawable.play);
-                Log.i(GN.TAG, "pause");
+                Log.i(TAG, "pause");
             } else {
                 player.start();
 
                 ((ImageView) view).setImageResource(R.drawable.pause);
                 //view.setBackgroundResource(R.drawable.pause);
-                Log.i(GN.TAG, "start");
+                Log.i(TAG, "start");
             }
         }
     }
@@ -482,7 +467,7 @@ public class MainActivity extends Activity {
     class ButtonNextOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            Log.i(GN.TAG, "next");
+            Log.i(TAG, "next");
 
             //player.release();
 
@@ -494,7 +479,7 @@ public class MainActivity extends Activity {
     class ButtonPrevOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            Log.i(GN.TAG, "prev");
+            Log.i(TAG, "prev");
 
             //player.release();
 
@@ -552,7 +537,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class ListenToPhoneState extends PhoneStateListener {
+   /* private class ListenToPhoneState extends PhoneStateListener {
         int currentRingerMode;
 
         public void onCallStateChanged(int state, String incomingNumber) {
@@ -581,12 +566,12 @@ public class MainActivity extends Activity {
             }
             return Integer.toString(state);
         }
-    }
+    }*/
 
     class SaveThisObjects {
         public Player player;
-        public UpdateTrackPosTask updateTrackPosTask;
-        public OffTimerTask offTimerTask;
+        //public UpdateTrackPosTask updateTrackPosTask;
+        //public OffTimerTask offTimerTask;
         public TrackList trackList;
     }
 }
