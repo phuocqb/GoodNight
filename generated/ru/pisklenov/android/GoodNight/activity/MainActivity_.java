@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageButton;
@@ -19,6 +21,9 @@ import android.widget.TextView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import ru.pisklenov.android.GoodNight.R.id;
 import ru.pisklenov.android.GoodNight.R.layout;
+import ru.pisklenov.android.GoodNight.activity.MainActivity.OffTimerTask;
+import ru.pisklenov.android.GoodNight.util.Player;
+import ru.pisklenov.android.GoodNight.util.TrackList;
 
 public final class MainActivity_
     extends MainActivity
@@ -33,19 +38,20 @@ public final class MainActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        restoreSavedInstanceState_(savedInstanceState);
     }
 
     private void afterSetContentView_() {
-        imageButtonPhoneControl = ((ImageButton) findViewById(id.buttonPhoneControl));
         imageViewWallpaper = ((ImageView) findViewById(id.imageViewWallpaper));
-        imageButtonTrackList = ((ImageButton) findViewById(id.buttonTrackList));
-        imageButtonNext = ((ImageButton) findViewById(id.buttonNext));
-        imageButtonTimer = ((ImageButton) findViewById(id.buttonTimer));
-        textViewTitle = ((TextView) findViewById(id.textViewTitle));
-        imageButtonPrev = ((ImageButton) findViewById(id.buttonPrev));
-        progressBar = ((ProgressBar) findViewById(id.progressBar));
         textViewOffTimer = ((TextView) findViewById(id.textViewOffTimer));
-        imageButtonPlay = ((ImageButton) findViewById(id.buttonPlay));
+        progressBar = ((ProgressBar) findViewById(id.progressBar));
+        imageButtonTrackList = ((ImageButton) findViewById(id.imageButtonTrackList));
+        imageButtonPrev = ((ImageButton) findViewById(id.imageButtonPrev));
+        imageButtonNext = ((ImageButton) findViewById(id.imageButtonNext));
+        imageButtonPlay = ((ImageButton) findViewById(id.imageButtonPlay));
+        imageButtonPhoneControl = ((ImageButton) findViewById(id.imageButtonPhoneControl));
+        textViewTitle = ((TextView) findViewById(id.textViewTitle));
+        imageButtonTimer = ((ImageButton) findViewById(id.imageButtonTimer));
         afterViews();
     }
 
@@ -77,6 +83,32 @@ public final class MainActivity_
 
     public static MainActivity_.IntentBuilder_ intent(Context context) {
         return new MainActivity_.IntentBuilder_(context);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(ru.pisklenov.android.GoodNight.R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle bundle) {
+        super.onSaveInstanceState(bundle);
+        bundle.putSerializable("player", player);
+        bundle.putSerializable("offTimerTask", offTimerTask);
+        bundle.putInt("currentPhoneState", currentPhoneState);
+        bundle.putSerializable("trackList", trackList);
+    }
+
+    private void restoreSavedInstanceState_(Bundle savedInstanceState) {
+        if (savedInstanceState == null) {
+            return ;
+        }
+        player = ((Player) savedInstanceState.getSerializable("player"));
+        offTimerTask = ((OffTimerTask) savedInstanceState.getSerializable("offTimerTask"));
+        currentPhoneState = savedInstanceState.getInt("currentPhoneState");
+        trackList = ((TrackList) savedInstanceState.getSerializable("trackList"));
     }
 
     public static class IntentBuilder_ {

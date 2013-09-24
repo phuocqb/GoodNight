@@ -11,9 +11,6 @@ import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -26,8 +23,10 @@ import android.widget.TextView;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.InstanceState;
+import com.googlecode.androidannotations.annotations.OptionsMenu;
 import com.googlecode.androidannotations.annotations.ViewById;
 
+import java.io.Serializable;
 import java.util.concurrent.TimeUnit;
 
 import ru.pisklenov.android.GoodNight.GN;
@@ -42,33 +41,34 @@ import ru.pisklenov.android.GoodNight.util.TrackList;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
 @EActivity (R.layout.main)
+@OptionsMenu(R.menu.main_menu)
 public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
-    @ViewById (R.id.buttonPlay)
+    @ViewById
     ImageButton imageButtonPlay;
-    @ViewById (R.id.buttonNext)
+    @ViewById
     ImageButton imageButtonNext;
-    @ViewById (R.id.buttonPrev)
+    @ViewById
     ImageButton imageButtonPrev;
-    @ViewById (R.id.buttonTimer)
+    @ViewById
     ImageButton imageButtonTimer;
-    @ViewById (R.id.buttonTrackList)
+    @ViewById
     ImageButton imageButtonTrackList;
-    @ViewById (R.id.buttonPhoneControl)
+    @ViewById
     ImageButton imageButtonPhoneControl;
 
-    @ViewById (R.id.imageViewWallpaper)
+    @ViewById
     ImageView imageViewWallpaper;
 
-    @ViewById (R.id.textViewTitle)
+    @ViewById
     TextView textViewTitle;
 
-    @ViewById (R.id.textViewOffTimer)
+    @ViewById
     TextView textViewOffTimer;
 
-    @ViewById (R.id.progressBar)
+    @ViewById
     ProgressBar progressBar;
 
     @InstanceState
@@ -76,33 +76,25 @@ public class MainActivity extends Activity {
     @InstanceState
     Player player;
 
-    UpdateTrackPosTask updateTrackPosTask;
-    UpdateWallpapers updateWallpapersTask;
+    @InstanceState
     OffTimerTask offTimerTask;
 
-    //ListenToPhoneState listener;
+    UpdateTrackPosTask updateTrackPosTask;
+    UpdateWallpapers updateWallpapersTask;
 
     PreferencesHelper preferencesHelper;
     PhoneModeHelper phoneModeHelper;
+
+    @InstanceState
     int currentPhoneState;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-
-        return true;
-    }
 
     @Override
     public void onStop() {
         super.onStop();
         if (DEBUG) Log.w(TAG, "MainActivity.onStop()");
 
-        // return default phone mode state
-        if (phoneModeHelper != null) {
-            phoneModeHelper.setMode(currentPhoneState);
-        }
+
     }
 
     @Override
@@ -111,6 +103,11 @@ public class MainActivity extends Activity {
 
         if (player != null) {
             player.release();
+        }
+
+        // return default phone mode state
+        if (phoneModeHelper != null) {
+            phoneModeHelper.setMode(currentPhoneState);
         }
     }
 
@@ -144,7 +141,6 @@ public class MainActivity extends Activity {
 
         updateTrackPosTask = new UpdateTrackPosTask();
         updateTrackPosTask.execute();
-
 
         updateWallpapersTask = new UpdateWallpapers();
         updateWallpapersTask.execute();
@@ -180,14 +176,14 @@ public class MainActivity extends Activity {
         Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
         Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
-        SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
+        /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
         if (saveThisObjects != null && saveThisObjects.trackList != null) {
             trackList = saveThisObjects.trackList;
         } else {
             trackList = new TrackList(0);
-        }
+        }*/
 
-        if (saveThisObjects != null && saveThisObjects.player != null) {
+        /*if (saveThisObjects != null && saveThisObjects.player != null) {
             player = saveThisObjects.player;
         } else {
             player = new Player(MainActivity.this);
@@ -208,36 +204,74 @@ public class MainActivity extends Activity {
             public void onEvent(Object o) {
                 textViewTitle.setText(((Track) o).title);
             }
-        });
+        });*/
     }
 
     @AfterViews
     void afterViews() {
-        //imageViewWallpaper = (ImageView) findViewById(R.id.imageViewWallpaper);
-
-        //imageButtonTimer = (ImageButton) findViewById(R.id.buttonTimer);
         imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
-
-        //imageButtonPlay = (ImageButton) findViewById(R.id.buttonPlay);
         imageButtonPlay.setOnClickListener(new ButtonPlayOnClickListener());
-
-        //imageButtonNext = (ImageButton) findViewById(R.id.buttonNext);
         imageButtonNext.setOnClickListener(new ButtonNextOnClickListener());
-
-        //imageButtonPrev = (ImageButton) findViewById(R.id.buttonPrev);
         imageButtonPrev.setOnClickListener(new ButtonPrevOnClickListener());
-
-        //imageButtonTrackList = (ImageButton) findViewById(R.id.buttonTrackList);
         imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
-
-
-        //imageButtonPhoneControl = (ImageButton) findViewById(R.id.buttonPhoneControl);
         imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
 
-        //progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setMax(100);
+        //progressBar.setMax(100);
+
+        if (trackList == null) {
+            trackList = new TrackList(0);
+        }
 
         textViewTitle.setText(trackList.getCurrentTrack().title);
+
+
+        if (player == null) {
+            player = getPlayer();
+        }
+
+       /* if (player == null) {
+            player = new Player(MainActivity.this);
+            player.createPlayer(trackList.getCurrentTrack());
+        }
+
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (DEBUG) Log.i(TAG, "player.OnCompletionListener() go next track");
+                imageButtonNext.performClick();
+            }
+        });
+        player.setTrackChangeEventListener(new Player.OnTrackChangeEventListener() {
+            @Override
+            public void onEvent(Object o) {
+                if (DEBUG) Log.i(TAG, "player.OnTrackChangeEventListener() track changed");
+                textViewTitle.setText(((Track) o).title);
+            }
+        });*/
+    }
+
+
+    private Player getPlayer() {
+        Player player = new Player(MainActivity.this);
+
+        player.createPlayer(trackList.getCurrentTrack(), false);
+
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                if (DEBUG) Log.i(TAG, "player.OnCompletionListener() go next track");
+                imageButtonNext.performClick();
+            }
+        });
+        player.setTrackChangeEventListener(new Player.OnTrackChangeEventListener() {
+            @Override
+            public void onEvent(Object o) {
+                if (DEBUG) Log.i(TAG, "player.OnTrackChangeEventListener() track changed");
+                textViewTitle.setText(((Track) o).title);
+            }
+        });
+
+        return player;
     }
 
 
@@ -255,7 +289,7 @@ public class MainActivity extends Activity {
         return saveThisObjects;
     }*/
 
-    @Override
+   /* @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
 
@@ -263,20 +297,20 @@ public class MainActivity extends Activity {
 
 
         switch (v.getId()) {
-            case R.id.buttonTimer:
+            case R.id.imageButtonTimer:
                 Log.i(TAG, "THIS IS buttonTimer");
                 break;
-            case R.id.buttonPhoneControl:
+            case R.id.imageButtonPhoneControl:
                 Log.i(TAG, "THIS IS buttonPhoneControl");
                 break;
         }
 
         Log.d(TAG, "onCreateContextMenu");
         inflater.inflate(R.menu.off_timer, menu);
-    }
+    }*/
 
 
-    class OffTimerTask extends AsyncTask<Void, Void, Void> {
+    class OffTimerTask extends AsyncTask<Void, Void, Void> implements Serializable {
         int secondCounter; // ony seconds
 
         OffTimerTask(int secondCounter) {
@@ -409,14 +443,13 @@ public class MainActivity extends Activity {
 
             switch (item.getItemId()) {
                 case R.id.phone_control_mute_on:
-                    //
+                    phoneModeHelper.setModeSilent();
                     break;
                 case R.id.phone_control_mute_off:
-
+                    phoneModeHelper.setModeNormal();
                     break;
 
-                default:
-                    ;
+                default: ;
             }
         }
     }
@@ -458,7 +491,7 @@ public class MainActivity extends Activity {
         public void onClick(View view) {
             if (!player.isLoading && !player.isPlaying()) {
                 Track track = trackList.getCurrentTrack();
-                player.playRes(track);
+                player.createPlayer(track, true);
 
                 return;
             }
@@ -485,9 +518,12 @@ public class MainActivity extends Activity {
             Log.i(TAG, "next");
 
             //player.release();
-
-            Track track = trackList.getNextTrack();
-            player.playRes(track);
+            if (player != null) {
+                player.createPlayer(trackList.getNextTrack(), false);
+                imageButtonPlay.performClick();
+            }
+           /* Track track = trackList.getNextTrack();
+            player.playTrack(track);*/
         }
     }
 
@@ -497,9 +533,12 @@ public class MainActivity extends Activity {
             Log.i(TAG, "prev");
 
             //player.release();
-
-            Track track = trackList.getPrevTrack();
-            player.playRes(track);
+            if (player != null) {
+                player.createPlayer(trackList.getPrevTrack(), false);
+                imageButtonPlay.performClick();
+            }
+            /*Track track = trackList.getPrevTrack();
+            player.playTrack(track);*/
         }
     }
 
@@ -542,7 +581,7 @@ public class MainActivity extends Activity {
                     trackList.setCurrentTrack(strName);
 
                     Track track = trackList.getCurrentTrack();
-                    player.playRes(track);
+                    player.createPlayer(track, true);
 
                     dialogInterface.dismiss();
                 }

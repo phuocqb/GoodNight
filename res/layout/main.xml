@@ -19,7 +19,7 @@
         <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/buttonTrackList"
+            android:id="@+id/imageButtonTrackList"
             android:layout_alignParentRight="false"
             android:layout_alignParentLeft="true"
             android:background="@drawable/list2" />
@@ -35,7 +35,7 @@
             android:layout_alignParentTop="false"
             android:layout_alignParentRight="false"
             android:textSize="18sp"
-            android:layout_toRightOf="@+id/buttonTrackList"
+            android:layout_toRightOf="@+id/imageButtonTrackList"
             android:layout_centerVertical="true"
             android:textColor="@color/title_color" />
 
@@ -46,15 +46,16 @@
             android:id="@+id/progressBar"
             android:layout_alignParentBottom="false"
             android:layout_margin="5dp"
-            android:layout_alignBottom="@+id/buttonTrackList"
-            android:layout_toRightOf="@+id/buttonTrackList" />
+            android:layout_alignBottom="@+id/imageButtonTrackList"
+            android:layout_toRightOf="@+id/imageButtonTrackList"
+            android:max="100"/>
 
     </RelativeLayout>
 
     <ImageButton
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/buttonTimer"
+        android:id="@+id/imageButtonTimer"
         android:layout_above="@+id/textViewOffTimer"
         android:layout_alignParentRight="true"
         android:background="@drawable/button_background_selector"
@@ -64,7 +65,7 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonPlay"
+        android:id="@+id/imageButtonPlay"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="@drawable/button_background_selector"
@@ -73,20 +74,20 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonNext"
+        android:id="@+id/imageButtonNext"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_toRightOf="@+id/buttonPlay"
+        android:layout_toRightOf="@+id/imageButtonPlay"
         android:background="@drawable/button_background_selector"
         android:src="@drawable/next" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/buttonPrev"
+        android:id="@+id/imageButtonPrev"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_toLeftOf="@+id/buttonPlay"
+        android:layout_toLeftOf="@+id/imageButtonPlay"
         android:background="@drawable/button_background_selector"
         android:src="@drawable/previous" />
 
@@ -95,18 +96,18 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/textViewOffTimer"
-        android:layout_above="@+id/buttonNext"
+        android:layout_above="@+id/imageButtonNext"
         android:layout_alignParentRight="true"
         android:visibility="invisible" />
 
     <ImageButton
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:id="@+id/buttonPhoneControl"
+        android:id="@+id/imageButtonPhoneControl"
         android:background="@drawable/button_background_selector"
         android:src="@drawable/phone_mute"
         android:scaleType="fitXY"
-        android:layout_alignTop="@+id/buttonTimer" />
+        android:layout_alignTop="@+id/imageButtonTimer" />
 
 </RelativeLayout>
 

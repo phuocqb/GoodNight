@@ -4,12 +4,14 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import java.io.Serializable;
+
 import ru.pisklenov.android.GoodNight.GN;
 
 /**
  * Created by dns on 10.09.13.
  */
-public class Player {
+public class Player implements Serializable {
     static final boolean DEBUG = GN.DEBUG;
 
     Context context;
@@ -18,6 +20,7 @@ public class Player {
     Track currentTrack;
 
     OnTrackChangeEventListener mListener;
+    MediaPlayer.OnCompletionListener onCompletionListener;
 
     public Player(Context context) {
         this.context = context;
@@ -25,50 +28,39 @@ public class Player {
         this.isLoading = false;
     }
 
-    public void createPlayer(Track track) {
+
+
+    public void createPlayer(Track track, boolean autoPlay) {
         release();
 
         currentTrack = track;
 
         if (DEBUG) Log.d(GN.TAG, "createPlayer() " + track.title);
-
-        mediaPlayer = MediaPlayer.create(context, currentTrack.resID);
-        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-                if (DEBUG) Log.e(GN.TAG, "MediaPlayer.onError " + i + " " + i2);
-
-                return false;
-            }
-        });
+        mediaPlayer = getMediaPlayer(context, currentTrack.resID);
 
         isLoading = true;
+
+        if (autoPlay) {
+            mediaPlayer.start();
+        }
 
         onTrackChange(currentTrack);
     }
 
-    public void playRes(Track track) {
+    /*public void playTrack(Track track) {
         release();
 
         currentTrack = track;
 
-        if (DEBUG) Log.d(GN.TAG, "playRes() " + track.title);
+        if (DEBUG) Log.d(GN.TAG, "playTrack() " + track.title);
 
-        mediaPlayer = MediaPlayer.create(context, currentTrack.resID);
-        mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
-            @Override
-            public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
-                if (DEBUG) Log.e(GN.TAG, "MediaPlayer.onError " + i + " " + i2);
-
-                return false;
-            }
-        });
+        mediaPlayer = getMediaPlayer(context, currentTrack.resID);
         isLoading = true;
 
         mediaPlayer.start();
 
         onTrackChange(currentTrack);
-    }
+    }*/
 
     public void start() {
         if (mediaPlayer != null) {
@@ -77,6 +69,29 @@ public class Player {
             if (DEBUG) Log.d(GN.TAG, "Player.start()");
         }
     }
+
+
+    private MediaPlayer getMediaPlayer(Context ctx, int resID) {
+        MediaPlayer mediaPlayer1 = MediaPlayer.create(ctx, resID);
+        mediaPlayer1.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+            @Override
+            public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
+                if (DEBUG) Log.e(GN.TAG, "MediaPlayer.onError " + i + " " + i2);
+                return false;
+            }
+        });
+
+        mediaPlayer1.setOnCompletionListener(onCompletionListener);
+
+        return mediaPlayer1;
+    }
+    /*public void loadTrack(Track track) {
+        if (mediaPlayer != null) {
+            mediaPlayer.start();
+
+            if (DEBUG) Log.d(GN.TAG, "Player.start()");
+        }
+    }*/
 
     public void pause() {
         if (mediaPlayer != null) {
@@ -116,11 +131,7 @@ public class Player {
         return 0;
     }
 
-    public void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
-        if (mediaPlayer != null) {
-            mediaPlayer.setOnCompletionListener(listener);
-        }
-    }
+
 
     public boolean isPlaying() {
         if (mediaPlayer != null) {
@@ -131,6 +142,14 @@ public class Player {
         }
 
         return false;
+    }
+
+    public void setOnCompletionListener(MediaPlayer.OnCompletionListener listener) {
+        this.onCompletionListener = listener;
+
+        if (mediaPlayer != null) {
+            mediaPlayer.setOnCompletionListener(listener);
+        }
     }
 
     private void onTrackChange(Object o) {
