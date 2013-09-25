@@ -21,7 +21,6 @@ import android.widget.TextView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import ru.pisklenov.android.GoodNight.R.id;
 import ru.pisklenov.android.GoodNight.R.layout;
-import ru.pisklenov.android.GoodNight.activity.MainActivity.OffTimerTask;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.TrackList;
 
@@ -43,15 +42,15 @@ public final class MainActivity_
 
     private void afterSetContentView_() {
         imageViewWallpaper = ((ImageView) findViewById(id.imageViewWallpaper));
-        textViewOffTimer = ((TextView) findViewById(id.textViewOffTimer));
         progressBar = ((ProgressBar) findViewById(id.progressBar));
-        imageButtonTrackList = ((ImageButton) findViewById(id.imageButtonTrackList));
-        imageButtonPrev = ((ImageButton) findViewById(id.imageButtonPrev));
-        imageButtonNext = ((ImageButton) findViewById(id.imageButtonNext));
-        imageButtonPlay = ((ImageButton) findViewById(id.imageButtonPlay));
-        imageButtonPhoneControl = ((ImageButton) findViewById(id.imageButtonPhoneControl));
         textViewTitle = ((TextView) findViewById(id.textViewTitle));
         imageButtonTimer = ((ImageButton) findViewById(id.imageButtonTimer));
+        imageButtonPlay = ((ImageButton) findViewById(id.imageButtonPlay));
+        textViewOffTimer = ((TextView) findViewById(id.textViewOffTimer));
+        imageButtonPhoneControl = ((ImageButton) findViewById(id.imageButtonPhoneControl));
+        imageButtonPrev = ((ImageButton) findViewById(id.imageButtonPrev));
+        imageButtonTrackList = ((ImageButton) findViewById(id.imageButtonTrackList));
+        imageButtonNext = ((ImageButton) findViewById(id.imageButtonNext));
         afterViews();
     }
 
@@ -96,9 +95,8 @@ public final class MainActivity_
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
         bundle.putSerializable("player", player);
-        bundle.putSerializable("offTimerTask", offTimerTask);
-        bundle.putInt("currentPhoneState", currentPhoneState);
         bundle.putSerializable("trackList", trackList);
+        bundle.putInt("currentPhoneState", currentPhoneState);
     }
 
     private void restoreSavedInstanceState_(Bundle savedInstanceState) {
@@ -106,9 +104,8 @@ public final class MainActivity_
             return ;
         }
         player = ((Player) savedInstanceState.getSerializable("player"));
-        offTimerTask = ((OffTimerTask) savedInstanceState.getSerializable("offTimerTask"));
-        currentPhoneState = savedInstanceState.getInt("currentPhoneState");
         trackList = ((TrackList) savedInstanceState.getSerializable("trackList"));
+        currentPhoneState = savedInstanceState.getInt("currentPhoneState");
     }
 
     public static class IntentBuilder_ {

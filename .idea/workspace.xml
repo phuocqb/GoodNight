@@ -23,9 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="c06dcf39-5de0-4327-a539-6242385b14c7" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gen/ru/pisklenov/android/GoodNight/BuildConfig.java" afterPath="$PROJECT_DIR$/gen/ru/pisklenov/android/GoodNight/BuildConfig.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java" afterPath="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/activity/MainActivity.java" afterPath="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/activity/MainActivity.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/generated/ru/pisklenov/android/GoodNight/activity/MainActivity_.java" afterPath="$PROJECT_DIR$/generated/ru/pisklenov/android/GoodNight/activity/MainActivity_.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gen/ru/pisklenov/android/GoodNight/Manifest.java" afterPath="$PROJECT_DIR$/gen/ru/pisklenov/android/GoodNight/Manifest.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/Player.java" afterPath="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/Player.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gen/ru/pisklenov/android/GoodNight/R.java" afterPath="$PROJECT_DIR$/gen/ru/pisklenov/android/GoodNight/R.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -94,7 +97,7 @@
       <file leaf-file-name="MainActivity.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/activity/MainActivity.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="574" column="0" selection-start="18639" selection-end="18639" vertical-scroll-proportion="-2.012012" vertical-offset="9595" max-vertical-offset="9945">
+            <state line="80" column="20" selection-start="2440" selection-end="2440" vertical-scroll-proportion="0.625" vertical-offset="510" max-vertical-offset="9945">
               <folding />
             </state>
           </provider>
@@ -136,7 +139,7 @@
       <file leaf-file-name="Player.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="49" column="4" selection-start="1049" selection-end="1049" vertical-scroll-proportion="0.0" vertical-offset="833" max-vertical-offset="2958">
+            <state line="13" column="19" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="2805">
               <folding />
             </state>
           </provider>
@@ -172,7 +175,7 @@
       <file leaf-file-name="GN.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="2" column="31" selection-start="72" selection-end="72" vertical-scroll-proportion="0.0" vertical-offset="34" max-vertical-offset="442">
+            <state line="9" column="2" selection-start="185" selection-end="185" vertical-scroll-proportion="0.0" vertical-offset="1" max-vertical-offset="408">
               <folding />
             </state>
           </provider>
@@ -208,10 +211,10 @@
         <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/PreferencesHelper.java" />
         <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/MyActivity.java" />
         <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/activity/MainActivity_.java" />
-        <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java" />
         <option value="$PROJECT_DIR$/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/res/layout/main.xml" />
         <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/TrackList.java" />
+        <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java" />
         <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/Player.java" />
         <option value="$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/activity/MainActivity.java" />
       </list>
@@ -676,8 +679,8 @@
       <option name="ACTIVITY_CLASS" value="" />
       <option name="MODE" value="default_activity" />
       <option name="DEPLOY" value="true" />
-      <option name="TARGET_SELECTION_MODE" value="EMULATOR" />
-      <option name="PREFERRED_AVD" value="Android_2.3_slow" />
+      <option name="TARGET_SELECTION_MODE" value="USB_DEVICE" />
+      <option name="PREFERRED_AVD" value="" />
       <option name="USE_COMMAND_LINE" value="true" />
       <option name="COMMAND_LINE" value="" />
       <option name="WIPE_USER_DATA" value="false" />
@@ -731,7 +734,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -743,13 +746,14 @@
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.36842105" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2665535" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.4278438" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27348486" sideWeight="0.6315789" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2246941" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27348486" sideWeight="0.5721562" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22410867" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Documentation" active="false" anchor="right" auto_hide="true" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.32954547" sideWeight="0.7691002" order="3" side_tool="false" content_ui="tabs" x="451" y="100" width="783" height="544" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
@@ -758,7 +762,6 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24786325" sideWeight="0.67702556" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32925472" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2669633" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
   </component>
@@ -829,13 +832,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="2" column="31" selection-start="72" selection-end="72" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="442">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/res/layout/track_list.xml">
       <provider editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="272">
@@ -870,16 +866,23 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/GN.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="2" selection-start="185" selection-end="185" vertical-scroll-proportion="0.0" vertical-offset="1" max-vertical-offset="408">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/util/Player.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="49" column="4" selection-start="1049" selection-end="1049" vertical-scroll-proportion="0.0" vertical-offset="368" max-vertical-offset="2805">
+        <state line="13" column="19" selection-start="269" selection-end="269" vertical-scroll-proportion="0.0" vertical-offset="51" max-vertical-offset="2805">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/ru/pisklenov/android/GoodNight/activity/MainActivity.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="574" column="0" selection-start="18639" selection-end="18639" vertical-scroll-proportion="-2.012012" vertical-offset="9595" max-vertical-offset="9945">
+        <state line="80" column="20" selection-start="2440" selection-end="2440" vertical-scroll-proportion="0.625" vertical-offset="510" max-vertical-offset="9945">
           <folding />
         </state>
       </provider>

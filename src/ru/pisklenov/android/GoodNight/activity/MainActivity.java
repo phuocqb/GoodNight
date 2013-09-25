@@ -10,6 +10,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,10 +75,10 @@ public class MainActivity extends Activity {
 
     @InstanceState
     TrackList trackList;
-    @InstanceState
+    //@InstanceState
     Player player;
 
-    @InstanceState
+    //@InstanceState
     OffTimerTask offTimerTask;
 
     UpdateTrackPosTask updateTrackPosTask;

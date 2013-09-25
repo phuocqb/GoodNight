@@ -11,8 +11,9 @@ import ru.pisklenov.android.GoodNight.GN;
 /**
  * Created by dns on 10.09.13.
  */
-public class Player implements Serializable {
-    static final boolean DEBUG = GN.DEBUG;
+public class Player {
+    private static final boolean DEBUG = GN.DEBUG;
+    private static final long serialVersionUID = 0L;
 
     Context context;
     MediaPlayer mediaPlayer;
@@ -27,7 +28,6 @@ public class Player implements Serializable {
 
         this.isLoading = false;
     }
-
 
 
     public void createPlayer(Track track, boolean autoPlay) {
