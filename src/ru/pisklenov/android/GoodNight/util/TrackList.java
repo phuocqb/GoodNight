@@ -9,7 +9,7 @@ import ru.pisklenov.android.GoodNight.util.Track;
 /**
  * Created by anpi0413 on 10.09.13.
  */
-public class TrackList implements Serializable {
+public class TrackList {
     private ArrayList<Track> tracks;
     private int currentTrackNum;
 

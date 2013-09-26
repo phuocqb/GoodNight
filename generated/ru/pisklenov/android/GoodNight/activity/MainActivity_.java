@@ -21,8 +21,6 @@ import android.widget.TextView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import ru.pisklenov.android.GoodNight.R.id;
 import ru.pisklenov.android.GoodNight.R.layout;
-import ru.pisklenov.android.GoodNight.util.Player;
-import ru.pisklenov.android.GoodNight.util.TrackList;
 
 public final class MainActivity_
     extends MainActivity
@@ -41,14 +39,14 @@ public final class MainActivity_
     }
 
     private void afterSetContentView_() {
-        imageViewWallpaper = ((ImageView) findViewById(id.imageViewWallpaper));
+        imageButtonPhoneControl = ((ImageButton) findViewById(id.imageButtonPhoneControl));
         progressBar = ((ProgressBar) findViewById(id.progressBar));
+        imageViewWallpaper = ((ImageView) findViewById(id.imageViewWallpaper));
+        textViewOffTimer = ((TextView) findViewById(id.textViewOffTimer));
+        imageButtonPrev = ((ImageButton) findViewById(id.imageButtonPrev));
         textViewTitle = ((TextView) findViewById(id.textViewTitle));
         imageButtonTimer = ((ImageButton) findViewById(id.imageButtonTimer));
         imageButtonPlay = ((ImageButton) findViewById(id.imageButtonPlay));
-        textViewOffTimer = ((TextView) findViewById(id.textViewOffTimer));
-        imageButtonPhoneControl = ((ImageButton) findViewById(id.imageButtonPhoneControl));
-        imageButtonPrev = ((ImageButton) findViewById(id.imageButtonPrev));
         imageButtonTrackList = ((ImageButton) findViewById(id.imageButtonTrackList));
         imageButtonNext = ((ImageButton) findViewById(id.imageButtonNext));
         afterViews();
@@ -94,8 +92,6 @@ public final class MainActivity_
     @Override
     public void onSaveInstanceState(Bundle bundle) {
         super.onSaveInstanceState(bundle);
-        bundle.putSerializable("player", player);
-        bundle.putSerializable("trackList", trackList);
         bundle.putInt("currentPhoneState", currentPhoneState);
     }
 
@@ -103,8 +99,6 @@ public final class MainActivity_
         if (savedInstanceState == null) {
             return ;
         }
-        player = ((Player) savedInstanceState.getSerializable("player"));
-        trackList = ((TrackList) savedInstanceState.getSerializable("trackList"));
         currentPhoneState = savedInstanceState.getInt("currentPhoneState");
     }
 

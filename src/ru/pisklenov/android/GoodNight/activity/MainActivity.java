@@ -73,7 +73,7 @@ public class MainActivity extends Activity {
     @ViewById
     ProgressBar progressBar;
 
-    @InstanceState
+    //@InstanceState
     TrackList trackList;
     //@InstanceState
     Player player;
@@ -102,6 +102,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (DEBUG) Log.w(TAG, "MainActivity.onDestroy()");
 
         if (player != null) {
             player.release();
@@ -177,6 +178,14 @@ public class MainActivity extends Activity {
 
         Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
         Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
+
+
+        SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
+        if (saveThisObjects != null && saveThisObjects.player != null) {
+            player.setContext(MainActivity.this);
+        } else {
+            player = getPlayer();
+        }
 
         /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
         if (saveThisObjects != null && saveThisObjects.trackList != null) {
@@ -277,9 +286,7 @@ public class MainActivity extends Activity {
     }
 
 
-
-
-    /*@Override
+    @Override
     public Object onRetainNonConfigurationInstance() {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
 
@@ -289,7 +296,7 @@ public class MainActivity extends Activity {
         saveThisObjects.trackList = trackList;
 
         return saveThisObjects;
-    }*/
+    }
 
    /* @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -314,6 +321,7 @@ public class MainActivity extends Activity {
 
     class OffTimerTask extends AsyncTask<Void, Void, Void> implements Serializable {
         int secondCounter; // ony seconds
+        Context context;
 
         OffTimerTask(int secondCounter) {
             this.secondCounter = secondCounter;
@@ -326,6 +334,10 @@ public class MainActivity extends Activity {
                     publishProgress();
                     secondCounter--;
 
+                    if (secondCounter <= 0) {
+                        return null;
+                    }
+
                     TimeUnit.SECONDS.sleep(1);
                 } catch (InterruptedException e) {
                     return null;
@@ -336,7 +348,10 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Void... voids) {
-            if (textViewOffTimer.getVisibility() != View.VISIBLE) {
+            if (DEBUG) Log.d(TAG, "OffTimerTask " + secondCounter);
+
+            //TextView tmp_textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
+            if (textViewOffTimer != null && textViewOffTimer.getVisibility() != View.VISIBLE) {
                 textViewOffTimer.setVisibility(View.VISIBLE);
             }
 
@@ -351,8 +366,9 @@ public class MainActivity extends Activity {
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            if (textViewOffTimer != null) {
-                textViewOffTimer.setVisibility(View.INVISIBLE);
+            TextView tmp_textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
+            if (tmp_textViewOffTimer != null) {
+                tmp_textViewOffTimer.setVisibility(View.INVISIBLE);
             }
 
             if (player != null && player.isPlaying()) {
@@ -428,15 +444,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    class ButtonTimerOnClickListener implements Button.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            IconContextMenu cm = new IconContextMenu(MainActivity.this, R.menu.off_timer);
-            cm.setTitle(R.string.menu_timer_off_title);
-            cm.setOnIconContextItemSelectedListener(new TimerIconContextMenuSelectedListener());
-            cm.show();
-        }
-    }
 
     class PhoneControlIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
         @Override
@@ -544,6 +551,16 @@ public class MainActivity extends Activity {
         }
     }
 
+    class ButtonTimerOnClickListener implements Button.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            IconContextMenu cm = new IconContextMenu(MainActivity.this, R.menu.off_timer);
+            cm.setTitle(R.string.menu_timer_off_title);
+            cm.setOnIconContextItemSelectedListener(new TimerIconContextMenuSelectedListener());
+            cm.show();
+        }
+    }
+
     class ButtonPhoneControlOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -593,7 +610,7 @@ public class MainActivity extends Activity {
         }
     }
 
-   /* private class ListenToPhoneState extends PhoneStateListener {
+    /* private class ListenToPhoneState extends PhoneStateListener {
         int currentRingerMode;
 
         public void onCallStateChanged(int state, String incomingNumber) {

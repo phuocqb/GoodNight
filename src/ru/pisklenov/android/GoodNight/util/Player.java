@@ -47,6 +47,10 @@ public class Player {
         onTrackChange(currentTrack);
     }
 
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     /*public void playTrack(Track track) {
         release();
 
