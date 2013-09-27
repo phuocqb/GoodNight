@@ -1,3 +1,10 @@
+#My
+.idea/
+gen/
+generated/
+out/
+
+
 #################
 ## Eclipse
 #################
@@ -214,8 +221,3 @@ pip-log.txt
 #Mr Developer
 .mr.developer.cfg
 
-#My
-.idea
-gen/
-generated/
-out/
