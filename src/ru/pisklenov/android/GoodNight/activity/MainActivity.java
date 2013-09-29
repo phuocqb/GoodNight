@@ -2,8 +2,10 @@ package ru.pisklenov.android.GoodNight.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -19,6 +21,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -32,12 +35,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HostnameVerifier;
@@ -49,11 +56,14 @@ import javax.net.ssl.X509TrustManager;
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
-import ru.pisklenov.android.GoodNight.md5.MD5Helper;
+import ru.pisklenov.android.GoodNight.util.FileHelper;
+import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
+import ru.pisklenov.android.GoodNight.util.PlayerService;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
+import ru.pisklenov.android.GoodNight.util.SongsProvider;
 import ru.pisklenov.android.GoodNight.util.Track;
 import ru.pisklenov.android.GoodNight.util.TrackList;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
@@ -65,15 +75,15 @@ public class MainActivity extends Activity {
     private static final String TAG = GN.TAG;
 
     @ViewById
-    ImageButton imageButtonPlay;
+    public static ImageButton imageButtonPlay;
     @ViewById
-    ImageButton imageButtonNext;
+    public static ImageButton imageButtonNext;
     @ViewById
-    ImageButton imageButtonPrev;
+    public static ImageButton imageButtonPrev;
     @ViewById
-    ImageButton imageButtonTimer;
+    public static ImageButton imageButtonTimer;
     @ViewById
-    ImageButton imageButtonTrackList;
+    public static ImageButton imageButtonTrackList;
     @ViewById
     ImageButton imageButtonPhoneControl;
 
@@ -81,13 +91,18 @@ public class MainActivity extends Activity {
     ImageView imageViewWallpaper;
 
     @ViewById
-    TextView textViewTitle;
+    public static TextView textViewTitle;
 
     @ViewById
     TextView textViewOffTimer;
 
     @ViewById
-    ProgressBar progressBar;
+    public static TextView textViewSongCurrentDuration;
+
+    @ViewById
+    public static ProgressBar progressBar;
+    @ViewById
+    public static SeekBar seekBar;
 
     //@InstanceState
     TrackList trackList;
@@ -97,7 +112,7 @@ public class MainActivity extends Activity {
     //@InstanceState
     OffTimerTask offTimerTask;
 
-    UpdateTrackPosTask updateTrackPosTask;
+    //UpdateTrackPosTask updateTrackPosTask;
     UpdateWallpapers updateWallpapersTask;
 
     PreferencesHelper preferencesHelper;
@@ -106,19 +121,63 @@ public class MainActivity extends Activity {
     @InstanceState
     int currentPhoneState;
 
+    // Songs list
+    public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+
+    public Intent playerService;
 
     @Override
     public void onStop() {
         super.onStop();
         if (DEBUG) Log.w(TAG, "MainActivity.onStop()");
+    }
 
+    // -- Cancel Notification
+    public void cancelNotification() {
+        String notificationServiceStr = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(notificationServiceStr);
+        mNotificationManager.cancel(PlayerService.NOTIFICATION_ID);
+    }
 
+    /** Create a File for saving an image or video */
+    private  File getOutputMediaFile(){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+                + "/Android/data/"
+                + getApplicationContext().getPackageName()
+                + "/Files");
+
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        File mediaFile;
+        String mImageName="MI_"+ timeStamp +".jpg";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+        return mediaFile;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (DEBUG) Log.w(TAG, "MainActivity.onDestroy()");
+
+        if (!PlayerService.mp.isPlaying()) {
+            stopService(playerService);
+            cancelNotification();
+        }
+
+        /*if (playerService != null) {
+            stopService(playerService);
+        }*/
 
         if (player != null) {
             player.release();
@@ -141,10 +200,10 @@ public class MainActivity extends Activity {
 
         if (DEBUG) Log.w(TAG, "MainActivity.onPause()");
 
-        if (updateTrackPosTask != null) {
+       /* if (updateTrackPosTask != null) {
             updateTrackPosTask.cancel(true);
             updateTrackPosTask = null;
-        }
+        }*/
 
         if (updateWallpapersTask != null) {
             updateWallpapersTask.cancel(true);
@@ -158,9 +217,9 @@ public class MainActivity extends Activity {
 
         if (DEBUG) Log.w(TAG, "MainActivity.onResume()");
 
-        updateTrackPosTask = new UpdateTrackPosTask();
+        /*updateTrackPosTask = new UpdateTrackPosTask();
         updateTrackPosTask.execute();
-
+*/
         updateWallpapersTask = new UpdateWallpapers();
         updateWallpapersTask.execute();
     }
@@ -174,6 +233,21 @@ public class MainActivity extends Activity {
         setContentView(R.layout.main);
 
         if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
+
+
+        new UnpackTask().execute();
+
+       /* File file = new File("file:///android_asset/jungle_02.mp3");
+        if(file.exists()) {
+            Log.e(TAG, "file.exists() " + "file:///android_asset/jungle_02.mp3");
+        } else {
+            Log.e(TAG, "!!!file.exists() " + "file:///android_asset/jungle_02.mp3");
+        }*/
+
+
+
+        SongsProvider plm = new SongsProvider(MainActivity.this);
+        songsList = plm.getPlayList();
 
         // create preferences class
         preferencesHelper = new PreferencesHelper(MainActivity.this);
@@ -190,21 +264,22 @@ public class MainActivity extends Activity {
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) Math.round(maxVolume * 0.2), 0);
+        //audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) Math.round(maxVolume * 0.2), 0);
 
         Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
         Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
 
-        SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
+        /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
         if (saveThisObjects != null && saveThisObjects.player != null) {
             player.setContext(MainActivity.this);
         } else {
             player = getPlayer();
-        }
+        }*/
 
 
-        new DownloadTask().execute();
+        /*new DownloadTask().execute();*/
+
 
         /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
         if (saveThisObjects != null && saveThisObjects.trackList != null) {
@@ -239,12 +314,12 @@ public class MainActivity extends Activity {
 
     @AfterViews
     void afterViews() {
-        imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
+        /*imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
         imageButtonPlay.setOnClickListener(new ButtonPlayOnClickListener());
         imageButtonNext.setOnClickListener(new ButtonNextOnClickListener());
         imageButtonPrev.setOnClickListener(new ButtonPrevOnClickListener());
         imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
-        imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
+        imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());*/
 
         //progressBar.setMax(100);
 
@@ -252,14 +327,20 @@ public class MainActivity extends Activity {
             trackList = new TrackList(0);
         }
 
-        textViewTitle.setText(trackList.getCurrentTrack().title);
+//        textViewTitle.setText(trackList.getCurrentTrack().title);
 
-
-        if (player == null) {
-            player = getPlayer();
-        }
 
        /* if (player == null) {
+            player = getPlayer();
+        }*/
+
+        playerService = new Intent(this, PlayerService.class);
+        playerService.putExtra("songIndex", PlayerService.currentSongIndex);
+        startService(playerService);
+
+
+
+        /* if (player == null) {
             player = new Player(MainActivity.this);
             player.createPlayer(trackList.getCurrentTrack());
         }
@@ -652,6 +733,32 @@ public class MainActivity extends Activity {
         }
     }
 
+
+    class UnpackTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (DEBUG) Log.i(TAG, "UnpackTask start");
+
+            HashMap<String, Integer> internalTracks = new HashMap<String, Integer>();
+            String path = MainActivity.this.getFilesDir() + "/";
+            internalTracks.put(path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair);
+            internalTracks.put(path + "sleep_away.mp3", R.raw.sleep_away);
+            internalTracks.put(path + "johann_sebastian_bach_minuet_in_g_from_anna_magdalena.mp3", R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
+            internalTracks.put(path + "johannes_brahms_waltz_no_15.mp3", R.raw.johannes_brahms_waltz_no_15);
+            internalTracks.put(path + "robert_schumann_kinderscene_op_15.mp3", R.raw.robert_schumann_kinderscene_op_15);
+
+            for(Map.Entry<String, Integer> entry: internalTracks.entrySet()) {
+                if (isCancelled()) return null;
+
+                if (!FileHelper.isFileExists(entry.getKey())) {
+                    FileHelper.copyFromResToInternal(MainActivity.this, entry.getValue(), entry.getKey());
+                }
+            }
+
+            if (DEBUG) Log.i(TAG, "UnpackTask finish");
+            return null;
+        }
+    }
 
     class DownloadTask extends AsyncTask<Void, Void, Void> {
         @Override

@@ -58,11 +58,12 @@ public class TrackList {
         ArrayList<Track> arrayList = new ArrayList<Track>();
 
 
-        arrayList.add(new Track("Jungle 1", R.raw.jungle_01));
+        /*arrayList.add(new Track("Jungle 1", R.raw.jungle_01));
         arrayList.add(new Track("Jungle 2", R.raw.jungle_02));
         arrayList.add(new Track("Jungle 3", R.raw.jungle_01));
         arrayList.add(new Track("Jungle 4", R.raw.jungle_02));
         arrayList.add(new Track("Jungle 5", R.raw.jungle_01));
+*/
 
         /*arrayList.add(new Track("Sleep away", R.raw.sleep_away));
         arrayList.add(new Track("Maid with the flaxen hair", R.raw.maid_with_the_flaxen_hair));

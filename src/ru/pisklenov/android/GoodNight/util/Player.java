@@ -13,7 +13,7 @@ import ru.pisklenov.android.GoodNight.GN;
  */
 public class Player {
     private static final boolean DEBUG = GN.DEBUG;
-    private static final long serialVersionUID = 0L;
+    //private static final long serialVersionUID = 0L;
 
     Context context;
     MediaPlayer mediaPlayer;
