@@ -20,15 +20,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
-import com.googlecode.androidannotations.annotations.AfterViews;
-import com.googlecode.androidannotations.annotations.EActivity;
-import com.googlecode.androidannotations.annotations.InstanceState;
-import com.googlecode.androidannotations.annotations.OptionsMenu;
-import com.googlecode.androidannotations.annotations.ViewById;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,9 +49,9 @@ import javax.net.ssl.X509TrustManager;
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
+import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
 import ru.pisklenov.android.GoodNight.util.MD5Helper;
-import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.PlayerService;
@@ -68,62 +61,41 @@ import ru.pisklenov.android.GoodNight.util.Track;
 import ru.pisklenov.android.GoodNight.util.TrackList;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
-@EActivity(R.layout.main)
-@OptionsMenu(R.menu.main_menu)
 public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
-    @ViewById
     public static ImageButton imageButtonPlay;
-    @ViewById
     public static ImageButton imageButtonNext;
-    @ViewById
     public static ImageButton imageButtonPrev;
-    @ViewById
-    public static ImageButton imageButtonTimer;
-    @ViewById
-    public static ImageButton imageButtonTrackList;
-    @ViewById
-    ImageButton imageButtonPhoneControl;
 
-    @ViewById
-    ImageView imageViewWallpaper;
-
-    @ViewById
-    public static TextView textViewTitle;
-
-    @ViewById
-    TextView textViewOffTimer;
-
-    @ViewById
     public static TextView textViewSongCurrentDuration;
+    public static TextView textViewTitle;
+    public static TextView textViewTotalDuration;
 
-    @ViewById
-    public static ProgressBar progressBar;
-    @ViewById
     public static SeekBar seekBar;
 
-    //@InstanceState
+    ImageButton imageButtonTimer;
+    ImageButton imageButtonPhoneControl;
+    ImageButton imageButtonTrackList;
+    ImageView imageViewWallpaper;
+    TextView textViewOffTimer;
+
+
     TrackList trackList;
-    //@InstanceState
     Player player;
 
-    //@InstanceState
-    OffTimerTask offTimerTask;
 
-    //UpdateTrackPosTask updateTrackPosTask;
-    UpdateWallpapers updateWallpapersTask;
+    OffTimerTask offTimerTask;
+    UpdateWallpapersTask updateWallpapersTask;
 
     PreferencesHelper preferencesHelper;
     PhoneModeHelper phoneModeHelper;
 
-    @InstanceState
     int currentPhoneState;
 
     // Songs list
     public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
-
     public Intent playerService;
 
     @Override
@@ -132,38 +104,7 @@ public class MainActivity extends Activity {
         if (DEBUG) Log.w(TAG, "MainActivity.onStop()");
     }
 
-    // -- Cancel Notification
-    public void cancelNotification() {
-        String notificationServiceStr = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(notificationServiceStr);
-        mNotificationManager.cancel(PlayerService.NOTIFICATION_ID);
-    }
 
-    /** Create a File for saving an image or video */
-    private  File getOutputMediaFile(){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
-                + "/Android/data/"
-                + getApplicationContext().getPackageName()
-                + "/Files");
-
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                return null;
-            }
-        }
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
-        File mediaFile;
-        String mImageName="MI_"+ timeStamp +".jpg";
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
-        return mediaFile;
-    }
 
     @Override
     protected void onDestroy() {
@@ -220,7 +161,7 @@ public class MainActivity extends Activity {
         /*updateTrackPosTask = new UpdateTrackPosTask();
         updateTrackPosTask.execute();
 */
-        updateWallpapersTask = new UpdateWallpapers();
+        updateWallpapersTask = new UpdateWallpapersTask();
         updateWallpapersTask.execute();
     }
 
@@ -231,6 +172,12 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+
+        initViews();
+
+        imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());
+        imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
+        imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
 
         if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
 
@@ -243,8 +190,10 @@ public class MainActivity extends Activity {
         } else {
             Log.e(TAG, "!!!file.exists() " + "file:///android_asset/jungle_02.mp3");
         }*/
-
-
+/*
+        if (trackList == null) {
+            trackList = new TrackList(0);
+        }*/
 
         SongsProvider plm = new SongsProvider(MainActivity.this);
         songsList = plm.getPlayList();
@@ -269,6 +218,11 @@ public class MainActivity extends Activity {
         Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
         Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
+
+
+        playerService = new Intent(this, PlayerService.class);
+        playerService.putExtra("songIndex", PlayerService.currentSongIndex);
+        startService(playerService);
 
         /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
         if (saveThisObjects != null && saveThisObjects.player != null) {
@@ -312,55 +266,55 @@ public class MainActivity extends Activity {
         });*/
     }
 
-    @AfterViews
-    void afterViews() {
-        /*imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
-        imageButtonPlay.setOnClickListener(new ButtonPlayOnClickListener());
-        imageButtonNext.setOnClickListener(new ButtonNextOnClickListener());
-        imageButtonPrev.setOnClickListener(new ButtonPrevOnClickListener());
-        imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
-        imageButtonPhoneControl.setOnClickListener(new ButtonPhoneControlOnClickListener());*/
+    private void initViews() {
+        imageButtonTimer = (ImageButton) findViewById(R.id.imageButtonTimer);
+        imageButtonPlay = (ImageButton) findViewById(R.id.imageButtonPlay);
+        imageButtonNext = (ImageButton) findViewById(R.id.imageButtonNext);
+        imageButtonPrev = (ImageButton) findViewById(R.id.imageButtonPrev);
+        imageButtonTrackList = (ImageButton) findViewById(R.id.imageButtonTrackList);
+        imageButtonPhoneControl = (ImageButton) findViewById(R.id.imageButtonPhoneControl);
 
-        //progressBar.setMax(100);
+        textViewTitle = (TextView) findViewById(R.id.textViewTitle);
+        textViewSongCurrentDuration = (TextView) findViewById(R.id.textViewSongCurrentDuration);
+        textViewTotalDuration = (TextView) findViewById(R.id.textViewTotalDuration);
+        textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
 
-        if (trackList == null) {
-            trackList = new TrackList(0);
-        }
-
-//        textViewTitle.setText(trackList.getCurrentTrack().title);
-
-
-       /* if (player == null) {
-            player = getPlayer();
-        }*/
-
-        playerService = new Intent(this, PlayerService.class);
-        playerService.putExtra("songIndex", PlayerService.currentSongIndex);
-        startService(playerService);
-
-
-
-        /* if (player == null) {
-            player = new Player(MainActivity.this);
-            player.createPlayer(trackList.getCurrentTrack());
-        }
-
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if (DEBUG) Log.i(TAG, "player.OnCompletionListener() go next track");
-                imageButtonNext.performClick();
-            }
-        });
-        player.setTrackChangeEventListener(new Player.OnTrackChangeEventListener() {
-            @Override
-            public void onEvent(Object o) {
-                if (DEBUG) Log.i(TAG, "player.OnTrackChangeEventListener() track changed");
-                textViewTitle.setText(((Track) o).title);
-            }
-        });*/
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
     }
 
+
+    // -- Cancel Notification
+    public void cancelNotification() {
+        String notificationServiceStr = Context.NOTIFICATION_SERVICE;
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(notificationServiceStr);
+        mNotificationManager.cancel(PlayerService.NOTIFICATION_ID);
+    }
+
+    /** Create a File for saving an image or video */
+    private  File getOutputMediaFile(){
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+                + "/Android/data/"
+                + getApplicationContext().getPackageName()
+                + "/Files");
+
+        // This location works best if you want the created images to be shared
+        // between applications and persist after your app has been uninstalled.
+
+        // Create the storage directory if it does not exist
+        if (! mediaStorageDir.exists()){
+            if (! mediaStorageDir.mkdirs()){
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
+        File mediaFile;
+        String mImageName="MI_"+ timeStamp +".jpg";
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+        return mediaFile;
+    }
 
     private Player getPlayer() {
         Player player = new Player(MainActivity.this);
@@ -478,7 +432,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
+   /* class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             while (!isCancelled()) {
@@ -507,9 +461,9 @@ public class MainActivity extends Activity {
                 //if (progressBar != null) progressBar.setProgress(0);
             }
         }
-    }
+    }*/
 
-    class UpdateWallpapers extends AsyncTask<Void, Void, Void> {
+    class UpdateWallpapersTask extends AsyncTask<Void, Void, Void> {
         static final int CHANGE_WALLPAPER_PERIOD = 10; // 10 second
         int secCounter = 0;
         int prevResID = 0;
@@ -681,9 +635,13 @@ public class MainActivity extends Activity {
             final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
                     MainActivity.this, android.R.layout.select_dialog_singlechoice);
 
-            for (Track track : trackList.getTracks()) {
-                arrayAdapter.add(track.title);
+
+            for (HashMap<String, String> map: songsList) {
+                arrayAdapter.add(map.get("songTitle"));
             }
+            /*for (Track track : trackList.getTracks()) {
+                arrayAdapter.add(track.title);
+            }*/
 
             builderSingle.setNegativeButton(R.string.cancel,
                     new DialogInterface.OnClickListener() {
@@ -693,7 +651,7 @@ public class MainActivity extends Activity {
                         }
                     });
 
-            int checkedItem = trackList.getCurrentTrackNum();
+            int checkedItem = 0;//trackList.getCurrentTrackNum();
             builderSingle.setSingleChoiceItems(arrayAdapter, checkedItem, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {

@@ -58,6 +58,15 @@ public class TrackList {
         ArrayList<Track> arrayList = new ArrayList<Track>();
 
 
+        arrayList.add(new Track("maid_with_the_flaxen_hair", path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair));
+
+        internalTracks.put(path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair);
+        internalTracks.put(path + "sleep_away.mp3", R.raw.sleep_away);
+        internalTracks.put(path + "johann_sebastian_bach_minuet_in_g_from_anna_magdalena.mp3", R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
+        internalTracks.put(path + "johannes_brahms_waltz_no_15.mp3", R.raw.johannes_brahms_waltz_no_15);
+        internalTracks.put(path + "robert_schumann_kinderscene_op_15.mp3", R.raw.robert_schumann_kinderscene_op_15);
+
+
         /*arrayList.add(new Track("Jungle 1", R.raw.jungle_01));
         arrayList.add(new Track("Jungle 2", R.raw.jungle_02));
         arrayList.add(new Track("Jungle 3", R.raw.jungle_01));

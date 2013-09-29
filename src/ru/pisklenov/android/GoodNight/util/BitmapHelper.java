@@ -38,9 +38,9 @@ public class BitmapHelper {
                     public void onAnimationEnd(Animation animation) {
                     }
                 });
-                v.startAnimation(anim_in);
+                if (v != null) v.startAnimation(anim_in);
             }
         });
-        v.startAnimation(anim_out);
+        if (v != null) v.startAnimation(anim_out);
     }
 }

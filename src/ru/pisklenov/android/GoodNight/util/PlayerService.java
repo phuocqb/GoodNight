@@ -33,9 +33,13 @@ import ru.pisklenov.android.GoodNight.activity.MainActivity;
 
 public class PlayerService extends Service implements MediaPlayer.OnCompletionListener,
         View.OnClickListener, SeekBar.OnSeekBarChangeListener {
+    private static String TAG = GN.TAG;
 
-    static String TAG = GN.TAG;
-
+    // Push Notification when Service is running.
+    // Set up the notification ID
+    public static final int NOTIFICATION_ID = 1;
+    public static MediaPlayer mp;
+    public static int currentSongIndex = -1;
 
     private WeakReference<ImageButton> btnRepeat, btnShuffle;
     private WeakReference<ImageButton> btnPlay, btnForward, btnBackward, btnNext, btnPrevious;
@@ -43,7 +47,6 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     private WeakReference<TextView> songTitleLabel;
     private WeakReference<TextView> songCurrentDurationLabel;
     private WeakReference<TextView> songTotalDurationLabel;
-    public static MediaPlayer mp;
     private Handler progressBarHandler = new Handler();
     private Utilities utils;
     private int seekForwardTime = 5000; // 5000 milliseconds
@@ -51,7 +54,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     private boolean isShuffle = false;
     private boolean isRepeat = false;
     private ArrayList<HashMap<String, String>> songsListingSD = new ArrayList<HashMap<String, String>>();
-    public static int currentSongIndex = -1;
+
+    private NotificationManager mNotificationManager;
 
     @Override
     public void onCreate() {
@@ -102,10 +106,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
      */
     private void initUI() {
         songTitleLabel = new WeakReference<TextView>(MainActivity.textViewTitle);
-        songCurrentDurationLabel = new WeakReference<TextView>(
-                MainActivity.textViewSongCurrentDuration);
-      /*  songTotalDurationLabel = new WeakReference<TextView>(
-                MainActivity.songTotalDurationLabel);*/
+        songCurrentDurationLabel = new WeakReference<TextView>(MainActivity.textViewSongCurrentDuration);
+        songTotalDurationLabel = new WeakReference<TextView>(MainActivity.textViewTotalDuration);
 
         btnPlay = new WeakReference<ImageButton>(MainActivity.imageButtonPlay);
        /* btnForward = new WeakReference<ImageView>(MainActivity.btnForward);
@@ -305,41 +307,6 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         progressBarHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
-    /**
-     * Background Runnable thread
-     */
-    private Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {
-            long totalDuration = 0;
-            try {
-                totalDuration = mp.getDuration();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-            long currentDuration = 0;
-            try {
-                currentDuration = mp.getCurrentPosition();
-            } catch (IllegalStateException e) {
-                e.printStackTrace();
-            }
-            // Displaying Total Duration time
-            /*songTotalDurationLabel.get().setText(
-                    "" + utils.milliSecondsToTimer(totalDuration));*/
-            // Displaying time completed playing
-            songCurrentDurationLabel.get().setText(
-                    "" + utils.milliSecondsToTimer(currentDuration));
-
-            // Updating progress bar
-            int progress = (int) (utils.getProgressPercentage(currentDuration, totalDuration));
-            // Log.d("Progress", ""+progress);
-            songProgressBar.get().setProgress(progress);
-
-            // Running this thread after 100 milliseconds
-            progressBarHandler.postDelayed(this, 500);
-            // Log.d("AndroidBuildingMusicPlayerActivity","Runable  progressbar");
-        }
-    };
-
     //--on Seekbar Change Listener
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
     }
@@ -399,6 +366,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         currentSongIndex = -1;
         //Remove progress bar update Hanlder callBacks
         progressBarHandler.removeCallbacks(mUpdateTimeTask);
+
         Log.d(TAG, "Player Service Stopped");
         if (mp != null) {
             if (mp.isPlaying()) {
@@ -406,13 +374,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             }
             mp.release();
         }
-
     }
-
-    // Push Notification when Service is running.
-    // Set up the notification ID
-    public static final int NOTIFICATION_ID = 1;
-    private NotificationManager mNotificationManager;
 
     // Create Notification
     private void initNotification(int songIndex) {
@@ -435,4 +397,38 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         mNotificationManager.notify(NOTIFICATION_ID, notification);
     }
 
+    /**
+     * Background Runnable thread
+     */
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            long totalDuration = 0;
+            try {
+                totalDuration = mp.getDuration();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+            long currentDuration = 0;
+            try {
+                currentDuration = mp.getCurrentPosition();
+            } catch (IllegalStateException e) {
+                e.printStackTrace();
+            }
+            // Displaying Total Duration time
+            songTotalDurationLabel.get().setText(
+                    "" + utils.milliSecondsToTimer(totalDuration));
+            // Displaying time completed playing
+            songCurrentDurationLabel.get().setText(
+                    "" + utils.milliSecondsToTimer(currentDuration));
+
+            // Updating progress bar
+            int progress = (int) (utils.getProgressPercentage(currentDuration, totalDuration));
+            // Log.d("Progress", ""+progress);
+            songProgressBar.get().setProgress(progress);
+
+            // Running this thread after 100 milliseconds
+            progressBarHandler.postDelayed(this, 500);
+            // Log.d("AndroidBuildingMusicPlayerActivity","Runable  progressbar");
+        }
+    };
 }
