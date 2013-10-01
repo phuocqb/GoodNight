@@ -4,8 +4,6 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.util.Log;
 
-import java.io.Serializable;
-
 import ru.pisklenov.android.GoodNight.GN;
 
 /**
@@ -18,7 +16,7 @@ public class Player {
     Context context;
     MediaPlayer mediaPlayer;
     public boolean isLoading;
-    Track currentTrack;
+    TrackList.Track currentTrack;
 
     OnTrackChangeEventListener mListener;
     MediaPlayer.OnCompletionListener onCompletionListener;
@@ -30,7 +28,7 @@ public class Player {
     }
 
 
-    public void createPlayer(Track track, boolean autoPlay) {
+    public void createPlayer(TrackList.Track track, boolean autoPlay) {
         release();
 
         currentTrack = track;

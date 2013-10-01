@@ -51,13 +51,13 @@ import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
+import ru.pisklenov.android.GoodNight.util.InternetHelper;
 import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.PlayerService;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
 import ru.pisklenov.android.GoodNight.util.SongsProvider;
-import ru.pisklenov.android.GoodNight.util.Track;
 import ru.pisklenov.android.GoodNight.util.TrackList;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
@@ -82,8 +82,8 @@ public class MainActivity extends Activity {
     TextView textViewOffTimer;
 
 
-    TrackList trackList;
-    Player player;
+    public static TrackList trackList;
+    //Player player;
 
 
     OffTimerTask offTimerTask;
@@ -120,9 +120,9 @@ public class MainActivity extends Activity {
             stopService(playerService);
         }*/
 
-        if (player != null) {
+      /*  if (player != null) {
             player.release();
-        }
+        }*/
 
         // return default phone mode state
         if (phoneModeHelper != null) {
@@ -190,10 +190,10 @@ public class MainActivity extends Activity {
         } else {
             Log.e(TAG, "!!!file.exists() " + "file:///android_asset/jungle_02.mp3");
         }*/
-/*
+
         if (trackList == null) {
             trackList = new TrackList(0);
-        }*/
+        }
 
         SongsProvider plm = new SongsProvider(MainActivity.this);
         songsList = plm.getPlayList();
@@ -224,6 +224,10 @@ public class MainActivity extends Activity {
         playerService.putExtra("songIndex", PlayerService.currentSongIndex);
         startService(playerService);
 
+
+        new DownloadTask().execute();
+
+
         /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
         if (saveThisObjects != null && saveThisObjects.player != null) {
             player.setContext(MainActivity.this);
@@ -232,7 +236,7 @@ public class MainActivity extends Activity {
         }*/
 
 
-        /*new DownloadTask().execute();*/
+
 
 
         /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
@@ -332,7 +336,7 @@ public class MainActivity extends Activity {
             @Override
             public void onEvent(Object o) {
                 if (DEBUG) Log.i(TAG, "player.OnTrackChangeEventListener() track changed");
-                textViewTitle.setText(((Track) o).title);
+                textViewTitle.setText(((TrackList.Track) o).title);
             }
         });
 
@@ -344,7 +348,7 @@ public class MainActivity extends Activity {
     public Object onRetainNonConfigurationInstance() {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
 
-        saveThisObjects.player = player;
+       // saveThisObjects.player = player;
         //saveThisObjects.offTimerTask = offTimerTask;
         //saveThisObjects.updateTrackPosTask = updateTrackPosTask;
         saveThisObjects.trackList = trackList;
@@ -425,10 +429,10 @@ public class MainActivity extends Activity {
                 tmp_textViewOffTimer.setVisibility(View.INVISIBLE);
             }
 
-            if (player != null && player.isPlaying()) {
+           /* if (player != null && player.isPlaying()) {
                 player.pause();
                 player.release();
-            }
+            }*/
         }
     }
 
@@ -550,11 +554,11 @@ public class MainActivity extends Activity {
         }
     }
 
-    class ButtonPlayOnClickListener implements View.OnClickListener {
+    /*class ButtonPlayOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             if (!player.isLoading && !player.isPlaying()) {
-                Track track = trackList.getCurrentTrack();
+                TrackList.Track track = trackList.getCurrentTrack();
                 player.createPlayer(track, true);
 
                 return;
@@ -574,9 +578,9 @@ public class MainActivity extends Activity {
                 Log.i(TAG, "start");
             }
         }
-    }
+    }*/
 
-    class ButtonNextOnClickListener implements View.OnClickListener {
+   /* class ButtonNextOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             Log.i(TAG, "next");
@@ -586,12 +590,12 @@ public class MainActivity extends Activity {
                 player.createPlayer(trackList.getNextTrack(), false);
                 imageButtonPlay.performClick();
             }
-           /* Track track = trackList.getNextTrack();
-            player.playTrack(track);*/
+           *//* Track track = trackList.getNextTrack();
+            player.playTrack(track);*//*
         }
-    }
+    }*/
 
-    class ButtonPrevOnClickListener implements View.OnClickListener {
+    /*class ButtonPrevOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             Log.i(TAG, "prev");
@@ -601,10 +605,10 @@ public class MainActivity extends Activity {
                 player.createPlayer(trackList.getPrevTrack(), false);
                 imageButtonPlay.performClick();
             }
-            /*Track track = trackList.getPrevTrack();
-            player.playTrack(track);*/
+            *//*Track track = trackList.getPrevTrack();
+            player.playTrack(track);*//*
         }
-    }
+    }*/
 
     class ButtonTimerOnClickListener implements Button.OnClickListener {
         @Override
@@ -658,8 +662,8 @@ public class MainActivity extends Activity {
                     String strName = arrayAdapter.getItem(i);
                     trackList.setCurrentTrack(strName);
 
-                    Track track = trackList.getCurrentTrack();
-                    player.createPlayer(track, true);
+                    TrackList.Track track = trackList.getCurrentTrack();
+                    //player.createPlayer(track, true);
 
                     dialogInterface.dismiss();
                 }
@@ -669,27 +673,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void trustEveryone() {
-        try {
-            HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier(){
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }});
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, new X509TrustManager[]{new X509TrustManager(){
-                public void checkClientTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {}
-                public void checkServerTrusted(X509Certificate[] chain,
-                                               String authType) throws CertificateException {}
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[0];
-                }}}, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(
-                    context.getSocketFactory());
-        } catch (Exception e) { // should never happen
-            e.printStackTrace();
-        }
-    }
+
 
 
     class UnpackTask extends AsyncTask<Void, Void, Void> {
@@ -697,7 +681,19 @@ public class MainActivity extends Activity {
         protected Void doInBackground(Void... voids) {
             if (DEBUG) Log.i(TAG, "UnpackTask start");
 
-            HashMap<String, Integer> internalTracks = new HashMap<String, Integer>();
+            String path = MainActivity.this.getFilesDir() + "/";
+            for (TrackList.Track track:trackList.getTracks()) {
+                if (isCancelled()) return null;
+
+                if (track.typeID == TrackList.Track.INTERNAL) {
+
+                    if (!FileHelper.isFileExists(path + track.pathToFile)) {
+                        FileHelper.copyFromResToInternal(MainActivity.this, track.resID, path + track.pathToFile);
+                    }
+                }
+            }
+
+            /*HashMap<String, Integer> internalTracks = new HashMap<String, Integer>();
             String path = MainActivity.this.getFilesDir() + "/";
             internalTracks.put(path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair);
             internalTracks.put(path + "sleep_away.mp3", R.raw.sleep_away);
@@ -711,7 +707,7 @@ public class MainActivity extends Activity {
                 if (!FileHelper.isFileExists(entry.getKey())) {
                     FileHelper.copyFromResToInternal(MainActivity.this, entry.getValue(), entry.getKey());
                 }
-            }
+            }*/
 
             if (DEBUG) Log.i(TAG, "UnpackTask finish");
             return null;
@@ -719,12 +715,19 @@ public class MainActivity extends Activity {
     }
 
     class DownloadTask extends AsyncTask<Void, Void, Void> {
+        static final String HTTPS_DRIVE_GOOGLE_COM = "https://drive.google.com/uc?id=%S&export=download";
+        static final String MAIN_FILE_ID = "https://drive.google.com/uc?id=%S&export=download";
+
         @Override
         protected Void doInBackground(Void... voids) {
             if (DEBUG) Log.i(TAG, "DownloadTask start");
-            try {
 
-                trustEveryone();
+            InternetHelper.trustEveryone();
+
+            InternetHelper.download(MainActivity.this, HTTPS_DRIVE_GOOGLE_COM.format(MAIN_FILE_ID), "test1");
+
+           /* try {
+
 
 
                 //set the download URL, a url that points to a file on the internet
@@ -811,7 +814,7 @@ public class MainActivity extends Activity {
                 if (DEBUG) Log.e(TAG, "IOException " + e.getLocalizedMessage());
                 //e.printStackTrace();
             }
-
+*/
             return null;
         }
 
@@ -855,7 +858,7 @@ public class MainActivity extends Activity {
     }*/
 
     class SaveThisObjects {
-        public Player player;
+        //public Player player;
         //public UpdateTrackPosTask updateTrackPosTask;
         //public OffTimerTask offTimerTask;
         public TrackList trackList;

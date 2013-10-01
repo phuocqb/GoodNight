@@ -53,7 +53,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     private int seekBackwardTime = 5000; // 5000 milliseconds
     private boolean isShuffle = false;
     private boolean isRepeat = false;
-    private ArrayList<HashMap<String, String>> songsListingSD = new ArrayList<HashMap<String, String>>();
+    //private ArrayList<HashMap<String, String>> songsListingSD = new ArrayList<HashMap<String, String>>();
+    private TrackList trackList;
 
     private NotificationManager mNotificationManager;
 
@@ -66,7 +67,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         mp.reset();
         mp.setAudioStreamType(AudioManager.STREAM_MUSIC);//
         utils = new Utilities();
-        songsListingSD = MainActivity.songsList;
+
+        trackList = MainActivity.trackList;
+        //songsListingSD = MainActivity.songsList;
+
         songCurrentDurationLabel = new WeakReference<TextView>(MainActivity.textViewSongCurrentDuration);
         super.onCreate();
     }
@@ -81,7 +85,11 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             initNotification(songIndex);
             currentSongIndex = songIndex;
         } else if (currentSongIndex != -1) {
-            songTitleLabel.get().setText(songsListingSD.get(currentSongIndex).get("songTitle"));
+
+
+            songTitleLabel.get().setText(trackList.getTracks().get(currentSongIndex).title);
+            //songTitleLabel.get().setText(songsListingSD.get(currentSongIndex).get("songTitle"));
+
             if (mp.isPlaying())
                 btnPlay.get().setImageResource(R.drawable.pause);
             else
@@ -158,7 +166,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             case R.id.imageButtonNext:
                 // check if next song is there or not
                 Log.d(TAG, "Next");
-                if (currentSongIndex < (songsListingSD.size() - 1)) {
+
+
+                if (currentSongIndex < (trackList.getTracks().size() - 1)) {
+                //if (currentSongIndex < (songsListingSD.size() - 1)) {
                     playSong(currentSongIndex + 1);
                     currentSongIndex = currentSongIndex + 1;
                 } else {
@@ -175,8 +186,13 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                     currentSongIndex = currentSongIndex - 1;
                 } else {
                     // play last song
-                    playSong(songsListingSD.size() - 1);
-                    currentSongIndex = songsListingSD.size() - 1;
+
+
+                    playSong(trackList.getTracks().size() - 1);
+                    currentSongIndex = trackList.getTracks().size() - 1;
+
+//                    playSong(songsListingSD.size() - 1);
+//                    currentSongIndex = songsListingSD.size() - 1;
                 }
                 break;
 
@@ -273,8 +289,12 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             //mp.setDataSource(afd.getFileDescriptor());
             //mp.setDataSource(PlayerService.this, uri);
 
-
-            FileInputStream fileInputStream = new FileInputStream(songsListingSD.get(songIndex).get("songPath"));
+            String trackPath = null;
+            if (trackList.getTracks().get(songIndex).typeID == TrackList.Track.INTERNAL) {
+                trackPath = getFilesDir() + "/" + trackList.getTracks().get(songIndex).pathToFile;
+            }
+            FileInputStream fileInputStream = new FileInputStream(trackPath);
+            //FileInputStream fileInputStream = new FileInputStream(songsListingSD.get(songIndex).get("songPath"));
             mp.setDataSource(fileInputStream.getFD());
 
             //mp.setDataSource(songsListingSD.get(songIndex).get("songPath"));
@@ -282,7 +302,11 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             mp.start();
 
             // Displaying Song title
-            String songTitle = songsListingSD.get(songIndex).get("songTitle");
+
+
+            String songTitle = trackList.getTracks().get(songIndex).title;
+            //String songTitle = songsListingSD.get(songIndex).get("songTitle");
+
             songTitleLabel.get().setText(songTitle);
             // Changing Button Image to pause image
             btnPlay.get().setImageResource(R.drawable.pause);
@@ -345,11 +369,20 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         } else if (isShuffle) {
             // shuffle is on - play a random song
             Random rand = new Random();
-            currentSongIndex = rand.nextInt((songsListingSD.size() - 1) - 0 + 1) + 0;
+
+
+            currentSongIndex = rand.nextInt((trackList.getTracks().size() - 1) - 0 + 1) + 0;
+            //currentSongIndex = rand.nextInt((songsListingSD.size() - 1) - 0 + 1) + 0;
+
             playSong(currentSongIndex);
         } else {
             // no repeat or shuffle ON - play next song
-            if (currentSongIndex < (songsListingSD.size() - 1)) {
+
+
+            if (currentSongIndex < (trackList.getTracks().size() - 1)) {
+            //if (currentSongIndex < (songsListingSD.size() - 1)) {
+
+
                 playSong(currentSongIndex + 1);
                 currentSongIndex = currentSongIndex + 1;
             } else {
@@ -386,7 +419,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         Notification notification = new Notification(icon, tickerText, when);
         notification.flags = Notification.FLAG_ONGOING_EVENT;
         Context context = getApplicationContext();
-        CharSequence songName = songsListingSD.get(songIndex).get("songTitle");
+
+
+        CharSequence songName = trackList.getTracks().get(songIndex).title;
+        //CharSequence songName = songsListingSD.get(songIndex).get("songTitle");
 
 
 

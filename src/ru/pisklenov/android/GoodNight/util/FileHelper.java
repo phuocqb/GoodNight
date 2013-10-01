@@ -1,6 +1,7 @@
 package ru.pisklenov.android.GoodNight.util;
 
 import android.content.Context;
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
@@ -46,5 +47,17 @@ public class FileHelper {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static File getAvailablePath(Context context) {
+        File result;
+
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            result = Environment.getExternalStorageDirectory();
+        } else {
+            result = context.getFilesDir();
+        }
+
+        return result;
     }
 }

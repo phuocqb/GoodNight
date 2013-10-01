@@ -1,10 +1,8 @@
 package ru.pisklenov.android.GoodNight.util;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 import ru.pisklenov.android.GoodNight.R;
-import ru.pisklenov.android.GoodNight.util.Track;
 
 /**
  * Created by anpi0413 on 10.09.13.
@@ -57,15 +55,11 @@ public class TrackList {
     public ArrayList<Track> getTracks() {
         ArrayList<Track> arrayList = new ArrayList<Track>();
 
-
-        arrayList.add(new Track("maid_with_the_flaxen_hair", path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair));
-
-        internalTracks.put(path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair);
-        internalTracks.put(path + "sleep_away.mp3", R.raw.sleep_away);
-        internalTracks.put(path + "johann_sebastian_bach_minuet_in_g_from_anna_magdalena.mp3", R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
-        internalTracks.put(path + "johannes_brahms_waltz_no_15.mp3", R.raw.johannes_brahms_waltz_no_15);
-        internalTracks.put(path + "robert_schumann_kinderscene_op_15.mp3", R.raw.robert_schumann_kinderscene_op_15);
-
+        arrayList.add(new Track("maid_with_the_flaxen_hair", R.raw.maid_with_the_flaxen_hair));
+        arrayList.add(new Track("sleep_away.mp3", R.raw.sleep_away));
+        arrayList.add(new Track("johann_sebastian_bach_minuet_in_g_from_anna_magdalena.mp3", R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena));
+        arrayList.add(new Track("johannes_brahms_waltz_no_15",R.raw.johannes_brahms_waltz_no_15));
+        arrayList.add(new Track("robert_schumann_kinderscene_op_15",R.raw.robert_schumann_kinderscene_op_15));
 
         /*arrayList.add(new Track("Jungle 1", R.raw.jungle_01));
         arrayList.add(new Track("Jungle 2", R.raw.jungle_02));
@@ -84,4 +78,39 @@ public class TrackList {
         return arrayList;
     }
 
+    /**
+    * Created by dns on 10.09.13.
+    */
+    public static class Track {
+        public static final int INTERNAL = 1;
+        public static final int EXTERNAL = 2;
+
+
+        public String title = null;
+        public String pathToFile = null;
+        public int resID = 0;
+        public int typeID = 0;
+
+        public Track(String title, String pathToFile) {
+            this.title = title;
+            this.pathToFile = pathToFile;
+
+            this.typeID = EXTERNAL;
+        }
+
+        public Track(String title, int resID) {
+            this.title = title;
+            this.pathToFile = String.valueOf(resID) + ".mp3";
+            this.resID = resID;
+
+            this.typeID = INTERNAL;
+        }
+
+       /* public Track(String title, String pathToFile, int resID, int typeID) {
+            this.title = title;
+            this.pathToFile = pathToFile;
+            this.resID = resID;
+            this.typeID = typeID;
+        }*/
+    }
 }
