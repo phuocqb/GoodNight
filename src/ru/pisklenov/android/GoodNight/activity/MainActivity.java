@@ -24,27 +24,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.SecureRandom;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.X509TrustManager;
 
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
@@ -52,7 +37,6 @@ import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
 import ru.pisklenov.android.GoodNight.util.InternetHelper;
-import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.PlayerService;
@@ -716,7 +700,7 @@ public class MainActivity extends Activity {
 
     class DownloadTask extends AsyncTask<Void, Void, Void> {
         static final String HTTPS_DRIVE_GOOGLE_COM = "https://drive.google.com/uc?id=%S&export=download";
-        static final String MAIN_FILE_ID = "https://drive.google.com/uc?id=%S&export=download";
+        static final String DRIVE_GOOGLE_MAIN_FILE_ID = "https://drive.google.com/uc?id=%S&export=download";
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -724,9 +708,9 @@ public class MainActivity extends Activity {
 
             InternetHelper.trustEveryone();
 
-            InternetHelper.download(MainActivity.this, HTTPS_DRIVE_GOOGLE_COM.format(MAIN_FILE_ID), "test1");
+            InternetHelper.download(MainActivity.this, String.format(HTTPS_DRIVE_GOOGLE_COM, DRIVE_GOOGLE_MAIN_FILE_ID), "test1");
 
-           /* try {
+            /* try {
 
 
 
