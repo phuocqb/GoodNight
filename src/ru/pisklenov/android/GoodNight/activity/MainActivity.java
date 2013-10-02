@@ -10,9 +10,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +27,7 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.Serializable;
+import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +40,7 @@ import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
 import ru.pisklenov.android.GoodNight.util.InternetHelper;
+import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.PlayerService;
@@ -166,7 +170,7 @@ public class MainActivity extends Activity {
         if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
 
 
-        new UnpackTask().execute();
+        //new UnpackTask().execute();
 
        /* File file = new File("file:///android_asset/jungle_02.mp3");
         if(file.exists()) {
@@ -700,23 +704,37 @@ public class MainActivity extends Activity {
 
     class DownloadTask extends AsyncTask<Void, Void, Void> {
         static final String HTTPS_DRIVE_GOOGLE_COM = "https://drive.google.com/uc?id=%S&export=download";
-        static final String DRIVE_GOOGLE_MAIN_FILE_ID = "https://drive.google.com/uc?id=%S&export=download";
+        static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mLWNyNDVNdWFsQ28";
+        //static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mSUN1R21GYktPRXc";
 
         @Override
         protected Void doInBackground(Void... voids) {
             if (DEBUG) Log.i(TAG, "DownloadTask start");
 
+            //URI raw = URI.create("android.resource://" + MainActivity.this.getPackageName() + "/raw/" + R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
+            /*File file = new File("android.resource://" + MainActivity.this.getPackageName() + "/raw/" + R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
+            if (DEBUG) Log.e(TAG, "MD5 " + MD5Helper.calculateMD5(file));*/
+
             InternetHelper.trustEveryone();
 
             InternetHelper.download(MainActivity.this, String.format(HTTPS_DRIVE_GOOGLE_COM, DRIVE_GOOGLE_MAIN_FILE_ID), "test1");
 
+
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            File file = new File(FileHelper.getAvailablePath(MainActivity.this), "test1");
+            if (DEBUG) Log.e(TAG, "MD5 " + MD5Helper.calculateMD5(file));
+
             /* try {
 
 
-
+//https://docs.google.com/file/d/0B96N99jRte7mSUN1R21GYktPRXc/edit?usp=sharing
                 //set the download URL, a url that points to a file on the internet
                 //this is the file to be downloaded
-                //https://drive.google.com/uc?id=0B96N99jRte7mMk93eDczODliZ2c&export=download
+                //https://drive.google.com/uc?id=0B96N99jRte7mLWNyNDVNdWFsQ28&export=download
                 URL url = new URL("https://drive.google.com/uc?id=0B96N99jRte7mMk93eDczODliZ2c&export=download");
                 if (DEBUG) Log.i(TAG, "DownloadTask url ok");
 
