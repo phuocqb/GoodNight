@@ -5,8 +5,11 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
@@ -40,6 +43,21 @@ public class FileHelper {
         }
     }
 
+    public static ArrayList<String> getLinesFromFile(File file) {
+        ArrayList<String> list = new ArrayList<String>();
+        try {
+            Scanner s = new Scanner(file);
+            while (s.hasNext()){
+                list.add(s.next());
+            }
+            s.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+         return list;
+    }
+
     public static boolean isFileExists(String fileName) {
         try {
             File file = new File(fileName);
@@ -50,14 +68,15 @@ public class FileHelper {
     }
 
     public static File getAvailablePath(Context context) {
-        File result;
+        String result;
 
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-            result = Environment.getExternalStorageDirectory();
+            result = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + context.getPackageName();
+            new File(result).mkdirs();
         } else {
-            result = context.getFilesDir();
+            result = context.getFilesDir().getAbsolutePath();
         }
 
-        return result;
+        return new File(result);
     }
 }

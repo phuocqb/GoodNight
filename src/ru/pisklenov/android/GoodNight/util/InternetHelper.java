@@ -32,7 +32,6 @@ public class InternetHelper {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
-
     public static boolean isWIFIAvailable(Context context) {
         ConnectivityManager connectivity = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -73,7 +72,7 @@ public class InternetHelper {
         }
     }
 
-    public static boolean download(Context context, String fromUrl, String toFile) {
+    public static boolean download(Context context, String fromUrl, File outputFile) {
         try {
             //set the download URL, a url that points to a file on the internet
             //this is the file to be downloaded
@@ -94,16 +93,7 @@ public class InternetHelper {
             urlConnection.connect();
             if (DEBUG) Log.i(TAG, "DownloadTask connect ok");
 
-            //set the path where we want to save the file
-            //in this case, going to save it on the root directory of the
-            //sd card.
-            File availablePath = FileHelper.getAvailablePath(context);
 
-            //File availablePath = Environment.getExternalStorageDirectory();
-            //create a new file, specifying the path, and the filename
-            //which we want to save the file as.
-            File outputFile = new File(availablePath, toFile);
-            if (DEBUG) Log.i(TAG, "DownloadTask file ok");
 
             //this will be used to write the downloaded data into the file we created
             FileOutputStream fileOutput = new FileOutputStream(outputFile);

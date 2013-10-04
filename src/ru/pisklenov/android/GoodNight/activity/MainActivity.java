@@ -32,10 +32,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
+import ru.pisklenov.android.GoodNight.download.Download;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
@@ -703,9 +705,12 @@ public class MainActivity extends Activity {
     }
 
     class DownloadTask extends AsyncTask<Void, Void, Void> {
-        static final String HTTPS_DRIVE_GOOGLE_COM = "https://drive.google.com/uc?id=%S&export=download";
-        static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mLWNyNDVNdWFsQ28";
+        static final String HTTPS_DRIVE_GOOGLE_COM = "https://drive.google.com/uc?id=%s&export=download";
+        //static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mLWNyNDVNdWFsQ28";
+        static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mSUN1R21GYktPRXc";
         //static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mSUN1R21GYktPRXc";
+
+        //0B96N99jRte7mSUN1R21GYktPRXc  - tracklist.txt
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -717,106 +722,50 @@ public class MainActivity extends Activity {
 
             InternetHelper.trustEveryone();
 
-            InternetHelper.download(MainActivity.this, String.format(HTTPS_DRIVE_GOOGLE_COM, DRIVE_GOOGLE_MAIN_FILE_ID), "test1");
+            final File availablePath = FileHelper.getAvailablePath(MainActivity.this);
+            final File trackListFile = new File(availablePath, "tracklist.txt");
 
 
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            File file = new File(FileHelper.getAvailablePath(MainActivity.this), "test1");
-            if (DEBUG) Log.e(TAG, "MD5 " + MD5Helper.calculateMD5(file));
+            final Download downloadTrackListFile = new Download(String.format(HTTPS_DRIVE_GOOGLE_COM, DRIVE_GOOGLE_MAIN_FILE_ID), trackListFile);
+            downloadTrackListFile.setOnCompleteListener(new Download.ActionOnCompleteListener() {
+                @Override
+                public void onComplete(Boolean isCompleteOk) {
+                    if (isCancelled()) return;
 
-            /* try {
+                    if (DEBUG) Log.w(TAG, "DOWNLOAD COMPLETE !!! " + isCompleteOk);
+
+                    if (isCompleteOk) {
+                        ArrayList<TrackList.DownloadedTrackItem> downloadedTrackItems = new ArrayList<TrackList.DownloadedTrackItem>();
+
+                        ArrayList<String> strings = FileHelper.getLinesFromFile(trackListFile);
+                        for (String line : strings) {
+                            if (DEBUG) Log.w(TAG, "line " + line);
+                            downloadedTrackItems.add(new TrackList.DownloadedTrackItem(line));
+                        }
+
+                        for (TrackList.DownloadedTrackItem downloadedTrackItem : downloadedTrackItems) {
+                            Download downloadTrack = new Download(String.format(HTTPS_DRIVE_GOOGLE_COM,
+                                    downloadedTrackItem.googleDriveID),
+                                    new File(availablePath, downloadedTrackItem.md5 + ".mp3"));
+
+                            downloadTrack.setOnCompleteListener(new Download.ActionOnCompleteListener() {
+                                @Override
+                                public void onComplete(Boolean isCompleteOk) {
+                                    if (isCompleteOk) {
 
 
-//https://docs.google.com/file/d/0B96N99jRte7mSUN1R21GYktPRXc/edit?usp=sharing
-                //set the download URL, a url that points to a file on the internet
-                //this is the file to be downloaded
-                //https://drive.google.com/uc?id=0B96N99jRte7mLWNyNDVNdWFsQ28&export=download
-                URL url = new URL("https://drive.google.com/uc?id=0B96N99jRte7mMk93eDczODliZ2c&export=download");
-                if (DEBUG) Log.i(TAG, "DownloadTask url ok");
+                                    }
+                                }
+                            });
 
-                //create the new connection
-                HttpsURLConnection urlConnection = (HttpsURLConnection) url.openConnection();
-                if (DEBUG) Log.i(TAG, "DownloadTask urlConnection ok");
-
-                //set up some things on the connection
-                urlConnection.setRequestMethod("GET");
-                urlConnection.setDoOutput(true);
-                //urlConnection.setSSLSocketFactory(MainActivity.this.getSocketFactory());
-
-                //and connect!
-                urlConnection.connect();
-                if (DEBUG) Log.i(TAG, "DownloadTask connect ok");
-
-                //set the path where we want to save the file
-                //in this case, going to save it on the root directory of the
-                //sd card.
-                File trackListFile;
-                if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
-
-                    if (DEBUG) Log.i(TAG, "DownloadTask trackListFile = Environment.MEDIA_MOUNTED");
-                    trackListFile = Environment.getExternalStorageDirectory();
-                } else {
-                    if (DEBUG) Log.i(TAG, "DownloadTask trackListFile = getFilesDir");
-                    trackListFile = getFilesDir();
+                            downloadTrack.startDownload();
+                        }
+                    }
                 }
-
-                //File trackListFile = Environment.getExternalStorageDirectory();
-                //create a new file, specifying the path, and the filename
-                //which we want to save the file as.
-                File outputFile = new File(trackListFile, "somefile.ext");
-                if (DEBUG) Log.i(TAG, "DownloadTask file ok");
-
-                //this will be used to write the downloaded data into the file we created
-                FileOutputStream fileOutput = new FileOutputStream(outputFile);
-
-                //this will be used in reading the data from the internet
-                InputStream inputStream = urlConnection.getInputStream();
-
-                //this is the total size of the file
-                int totalSize = urlConnection.getContentLength();
-                //variable to store total downloaded bytes
-                int downloadedSize = 0;
-
-                //create a buffer...
-                byte[] buffer = new byte[1024];
-                int bufferLength = 0; //used to store a temporary size of the buffer
-
-                //now, read through the input buffer and write the contents to the file
-                while ((bufferLength = inputStream.read(buffer)) > 0) {
-                    //add the data in the buffer to the file in the file output stream (the file on the sd card
-                    fileOutput.write(buffer, 0, bufferLength);
-                    //add up the size so we know how much is downloaded
-                    downloadedSize += bufferLength;
+            });
+            downloadTrackListFile.startDownload();
 
 
-                    //this is where you would do something to report the prgress, like this maybe
-                    //updateProgress(downloadedSize, totalSize);
-
-                    //if (DEBUG) Log.i(TAG, "downloadedSize = " + downloadedSize + " / " + totalSize);
-                }
-                //close the output stream when done
-                fileOutput.close();
-
-                if (DEBUG) Log.i(TAG, "DownloadTask OK");
-
-                if (DEBUG) Log.i(TAG, "DownloadTask calculateMD5 " + MD5Helper.calculateMD5(outputFile));
-
-
-
-//catch some possible errors...
-            } catch (MalformedURLException e) {
-                if (DEBUG) Log.e(TAG, "MalformedURLException " + e.getMessage());
-                //e.printStackTrace();
-            } catch (IOException e) {
-                if (DEBUG) Log.e(TAG, "IOException " + e.getMessage());
-                if (DEBUG) Log.e(TAG, "IOException " + e.getLocalizedMessage());
-                //e.printStackTrace();
-            }
-*/
             return null;
         }
 

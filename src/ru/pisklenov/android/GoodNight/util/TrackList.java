@@ -78,6 +78,24 @@ public class TrackList {
         return arrayList;
     }
 
+
+
+    public static class DownloadedTrackItem {
+        public String googleDriveID = null;
+        public String title = null;
+        public String md5 = null;
+
+        public DownloadedTrackItem(String lineToParse) {
+            String arr[];// = new String[2];
+
+            arr = lineToParse.split("\\|");
+
+            googleDriveID = arr[0];
+            title = arr[1];
+            md5 = arr[2];
+        }
+    }
+
     /**
     * Created by dns on 10.09.13.
     */
