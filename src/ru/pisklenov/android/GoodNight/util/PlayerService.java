@@ -19,8 +19,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.net.URI;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import ru.pisklenov.android.GoodNight.activity.MainActivity;
 public class PlayerService extends Service implements MediaPlayer.OnCompletionListener,
         View.OnClickListener, SeekBar.OnSeekBarChangeListener {
     private static String TAG = GN.TAG;
+    private static final boolean DEBUG = GN.DEBUG;
 
     // Push Notification when Service is running.
     // Set up the notification ID
@@ -60,7 +63,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     @Override
     public void onCreate() {
-        // TODO Auto-generated method stub
+        if (DEBUG) Log.i(TAG, " -- PlayerService.onCreate()");
 
         mp = new MediaPlayer();
         mp.setOnCompletionListener(this);
@@ -78,22 +81,29 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     // --------------onStartCommand-----------------------------------------//
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (DEBUG) Log.i(TAG, " -- PlayerService.onStartCommand()");
+
         initUI();
         int songIndex = intent.getIntExtra("songIndex", 0);
         if (songIndex != currentSongIndex) {
             playSong(songIndex);
-            initNotification(songIndex);
+            //initNotification(songIndex);
             currentSongIndex = songIndex;
-        } else if (currentSongIndex != -1) {
+        } else {
+            if (currentSongIndex != -1) {
 
 
-            songTitleLabel.get().setText(trackList.getTracks().get(currentSongIndex).title);
-            //songTitleLabel.get().setText(songsListingSD.get(currentSongIndex).get("songTitle"));
+                songTitleLabel.get().setText(trackList.getTracks(getApplicationContext()).get(currentSongIndex).title);
+                //songTitleLabel.get().setText(songsListingSD.get(currentSongIndex).get("songTitle"));
 
-            if (mp.isPlaying())
-                btnPlay.get().setImageResource(R.drawable.pause);
-            else
-                btnPlay.get().setImageResource(R.drawable.play);
+                if (mp.isPlaying())
+                    btnPlay.get().setImageResource(R.drawable.pause);
+                else
+                    btnPlay.get().setImageResource(R.drawable.play);
+            } else {
+                //currentSongIndex = 0;
+                //songTitleLabel.get().setText(trackList.getTracks().get(currentSongIndex).title);
+            }
         }
 
         super.onStart(intent, startId);
@@ -101,11 +111,9 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     }
 
     /**
-     *
      */
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -125,11 +133,11 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         /*btnRepeat = new WeakReference<ImageButton>(MainActivity.btnRepeat);
         btnShuffle = new WeakReference<ImageButton>(MainActivity.btnShuffle);*/
 
-        btnPlay.get().setOnClickListener(this);
+        if (btnPlay.get() != null) btnPlay.get().setOnClickListener(this);
        /* btnForward.get().setOnClickListener(this);
         btnBackward.get().setOnClickListener(this);*/
-        btnNext.get().setOnClickListener(this);
-        btnPrevious.get().setOnClickListener(this);
+        if (btnNext.get() != null) btnNext.get().setOnClickListener(this);
+        if (btnPrevious.get() != null) btnPrevious.get().setOnClickListener(this);
        /* btnRepeat.get().setOnClickListener(this);
         btnShuffle.get().setOnClickListener(this);*/
         // TODO Auto-generated method stub
@@ -160,7 +168,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                             Log.d(TAG, "Play");
                         }
                     }
+                } else {
+                    btnNext.get().performClick();
                 }
+
                 break;
 
             case R.id.imageButtonNext:
@@ -168,7 +179,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 Log.d(TAG, "Next");
 
 
-                if (currentSongIndex < (trackList.getTracks().size() - 1)) {
+                if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {
                 //if (currentSongIndex < (songsListingSD.size() - 1)) {
                     playSong(currentSongIndex + 1);
                     currentSongIndex = currentSongIndex + 1;
@@ -188,8 +199,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                     // play last song
 
 
-                    playSong(trackList.getTracks().size() - 1);
-                    currentSongIndex = trackList.getTracks().size() - 1;
+                    playSong(trackList.getTracks(getApplicationContext()).size() - 1);
+                    currentSongIndex = trackList.getTracks(getApplicationContext()).size() - 1;
 
 //                    playSong(songsListingSD.size() - 1);
 //                    currentSongIndex = songsListingSD.size() - 1;
@@ -272,6 +283,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
      * @param songIndex - index of song
      */
     public void playSong(int songIndex) {
+        if (DEBUG) Log.i(TAG, " -- PlayerService.playSong()");
+
         // Play song
         try {
            /* File file = new File(songsListingSD.get(songIndex).get("songPath"));
@@ -289,13 +302,22 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             //mp.setDataSource(afd.getFileDescriptor());
             //mp.setDataSource(PlayerService.this, uri);
 
-            String trackPath = null;
+           /* String trackPath = null;
             if (trackList.getTracks().get(songIndex).typeID == TrackList.Track.INTERNAL) {
                 trackPath = getFilesDir() + "/" + trackList.getTracks().get(songIndex).pathToFile;
             }
             FileInputStream fileInputStream = new FileInputStream(trackPath);
             //FileInputStream fileInputStream = new FileInputStream(songsListingSD.get(songIndex).get("songPath"));
-            mp.setDataSource(fileInputStream.getFD());
+            */
+
+            //InputStream fdstream = getApplicationContext().getResources().openRawResource(trackList.getTracks().get(songIndex).resID);
+            //FileDescriptor fd = fdstream.getFD();
+
+            Uri uri = Uri.parse("android.resource://" + getPackageName() + "/" + trackList.getTracks(getApplicationContext()).get(songIndex).resID); //do not add any extension
+            mp.setDataSource(getApplicationContext(), uri);
+
+
+            //mp.setDataSource(fd);
 
             //mp.setDataSource(songsListingSD.get(songIndex).get("songPath"));
             mp.prepare();
@@ -304,7 +326,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             // Displaying Song title
 
 
-            String songTitle = trackList.getTracks().get(songIndex).title;
+            String songTitle = trackList.getTracks(getApplicationContext()).get(songIndex).title;
             //String songTitle = songsListingSD.get(songIndex).get("songTitle");
 
             songTitleLabel.get().setText(songTitle);
@@ -313,8 +335,10 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             // set Progress bar values
             songProgressBar.get().setProgress(0);
             songProgressBar.get().setMax(100);
+
             // Updating progress bar
             updateProgressBar();
+
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IllegalStateException e) {
@@ -371,7 +395,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             Random rand = new Random();
 
 
-            currentSongIndex = rand.nextInt((trackList.getTracks().size() - 1) - 0 + 1) + 0;
+            currentSongIndex = rand.nextInt((trackList.getTracks(getApplicationContext()).size() - 1) - 0 + 1) + 0;
             //currentSongIndex = rand.nextInt((songsListingSD.size() - 1) - 0 + 1) + 0;
 
             playSong(currentSongIndex);
@@ -379,7 +403,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             // no repeat or shuffle ON - play next song
 
 
-            if (currentSongIndex < (trackList.getTracks().size() - 1)) {
+            if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {
             //if (currentSongIndex < (songsListingSD.size() - 1)) {
 
 
@@ -409,7 +433,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         }
     }
 
-    // Create Notification
+   /* // Create Notification
     private void initNotification(int songIndex) {
         String ns = Context.NOTIFICATION_SERVICE;
         mNotificationManager = (NotificationManager) getSystemService(ns);
@@ -431,7 +455,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 notificationIntent, 0);
         notification.setLatestEventInfo(context, songName, null, contentIntent);
         mNotificationManager.notify(NOTIFICATION_ID, notification);
-    }
+    }*/
 
     /**
      * Background Runnable thread
@@ -444,6 +468,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             } catch (IllegalStateException e) {
                 e.printStackTrace();
             }
+
             long currentDuration = 0;
             try {
                 currentDuration = mp.getCurrentPosition();

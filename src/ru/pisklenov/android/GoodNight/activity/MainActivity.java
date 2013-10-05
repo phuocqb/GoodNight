@@ -2,7 +2,6 @@ package ru.pisklenov.android.GoodNight.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,12 +9,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.SystemClock;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -27,28 +24,24 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.Serializable;
-import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
-import ru.pisklenov.android.GoodNight.download.Download;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
+import ru.pisklenov.android.GoodNight.internet.Download;
+import ru.pisklenov.android.GoodNight.internet.InternetHelper;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
-import ru.pisklenov.android.GoodNight.util.InternetHelper;
 import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
 import ru.pisklenov.android.GoodNight.util.Player;
 import ru.pisklenov.android.GoodNight.util.PlayerService;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
-import ru.pisklenov.android.GoodNight.util.SongsProvider;
 import ru.pisklenov.android.GoodNight.util.TrackList;
+import ru.pisklenov.android.GoodNight.util.VolumeHelper;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
 public class MainActivity extends Activity {
@@ -83,10 +76,18 @@ public class MainActivity extends Activity {
     PhoneModeHelper phoneModeHelper;
 
     int currentPhoneState;
+    int offTimerCount = 0;
 
     // Songs list
     public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
     public Intent playerService;
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
 
     @Override
     public void onStop() {
@@ -95,16 +96,16 @@ public class MainActivity extends Activity {
     }
 
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if (DEBUG) Log.w(TAG, "MainActivity.onDestroy()");
 
-        if (!PlayerService.mp.isPlaying()) {
-            stopService(playerService);
-            cancelNotification();
-        }
+        //if (!PlayerService.mp.isPlaying()) {
+            stopService(new Intent(MainActivity.this, PlayerService.class));
+            //stopService(playerService);
+            //cancelNotification();
+       // }
 
         /*if (playerService != null) {
             stopService(playerService);
@@ -171,7 +172,6 @@ public class MainActivity extends Activity {
 
         if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
 
-
         //new UnpackTask().execute();
 
        /* File file = new File("file:///android_asset/jungle_02.mp3");
@@ -182,11 +182,11 @@ public class MainActivity extends Activity {
         }*/
 
         if (trackList == null) {
-            trackList = new TrackList(0);
+            trackList = new TrackList(MainActivity.this, 0);
         }
 
-        SongsProvider plm = new SongsProvider(MainActivity.this);
-        songsList = plm.getPlayList();
+        /*SongsProvider plm = new SongsProvider(MainActivity.this);
+        songsList = plm.getPlayList();*/
 
         // create preferences class
         preferencesHelper = new PreferencesHelper(MainActivity.this);
@@ -209,21 +209,19 @@ public class MainActivity extends Activity {
         Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
 
 
-
         playerService = new Intent(this, PlayerService.class);
         playerService.putExtra("songIndex", PlayerService.currentSongIndex);
         startService(playerService);
 
 
-        new DownloadTask().execute();
+        //new DownloadTask().execute();
 
 
-        /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
-        if (saveThisObjects != null && saveThisObjects.player != null) {
-            player.setContext(MainActivity.this);
-        } else {
-            player = getPlayer();
-        }*/
+        SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
+        if (saveThisObjects != null && saveThisObjects.offTimerCount != 0) {
+            offTimerTask = new OffTimerTask(saveThisObjects.offTimerCount);
+            offTimerTask.execute();
+        }
 
 
 
@@ -268,6 +266,8 @@ public class MainActivity extends Activity {
         imageButtonTrackList = (ImageButton) findViewById(R.id.imageButtonTrackList);
         imageButtonPhoneControl = (ImageButton) findViewById(R.id.imageButtonPhoneControl);
 
+        imageViewWallpaper = (ImageView) findViewById(R.id.imageViewWallpaper);
+
         textViewTitle = (TextView) findViewById(R.id.textViewTitle);
         textViewSongCurrentDuration = (TextView) findViewById(R.id.textViewSongCurrentDuration);
         textViewTotalDuration = (TextView) findViewById(R.id.textViewTotalDuration);
@@ -277,38 +277,13 @@ public class MainActivity extends Activity {
     }
 
 
-    // -- Cancel Notification
+  /*  // -- Cancel Notification
     public void cancelNotification() {
         String notificationServiceStr = Context.NOTIFICATION_SERVICE;
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(notificationServiceStr);
         mNotificationManager.cancel(PlayerService.NOTIFICATION_ID);
-    }
+    }*/
 
-    /** Create a File for saving an image or video */
-    private  File getOutputMediaFile(){
-        // To be safe, you should check that the SDCard is mounted
-        // using Environment.getExternalStorageState() before doing this.
-        File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
-                + "/Android/data/"
-                + getApplicationContext().getPackageName()
-                + "/Files");
-
-        // This location works best if you want the created images to be shared
-        // between applications and persist after your app has been uninstalled.
-
-        // Create the storage directory if it does not exist
-        if (! mediaStorageDir.exists()){
-            if (! mediaStorageDir.mkdirs()){
-                return null;
-            }
-        }
-        // Create a media file name
-        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmm").format(new Date());
-        File mediaFile;
-        String mImageName="MI_"+ timeStamp +".jpg";
-        mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
-        return mediaFile;
-    }
 
     private Player getPlayer() {
         Player player = new Player(MainActivity.this);
@@ -338,41 +313,21 @@ public class MainActivity extends Activity {
     public Object onRetainNonConfigurationInstance() {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
 
-       // saveThisObjects.player = player;
-        //saveThisObjects.offTimerTask = offTimerTask;
+        // saveThisObjects.player = player;
+        saveThisObjects.offTimerCount = offTimerCount;
         //saveThisObjects.updateTrackPosTask = updateTrackPosTask;
         saveThisObjects.trackList = trackList;
 
         return saveThisObjects;
     }
 
-   /* @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-
-        MenuInflater inflater = getMenuInflater();
-
-
-        switch (v.getId()) {
-            case R.id.imageButtonTimer:
-                Log.i(TAG, "THIS IS buttonTimer");
-                break;
-            case R.id.imageButtonPhoneControl:
-                Log.i(TAG, "THIS IS buttonPhoneControl");
-                break;
-        }
-
-        Log.d(TAG, "onCreateContextMenu");
-        inflater.inflate(R.menu.off_timer, menu);
-    }*/
-
-
     class OffTimerTask extends AsyncTask<Void, Void, Void> implements Serializable {
-        int secondCounter; // ony seconds
-        Context context;
+        //int secondCounter; // ony seconds
+        //Context context;
 
         OffTimerTask(int secondCounter) {
-            this.secondCounter = secondCounter;
+            offTimerCount = secondCounter;
+            //this.secondCounter = secondCounter;
         }
 
         @Override
@@ -380,9 +335,9 @@ public class MainActivity extends Activity {
             while (!isCancelled()) {
                 try {
                     publishProgress();
-                    secondCounter--;
+                    offTimerCount--;
 
-                    if (secondCounter <= 0) {
+                    if (offTimerCount <= 0) {
                         return null;
                     }
 
@@ -396,7 +351,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Void... voids) {
-            if (DEBUG) Log.d(TAG, "OffTimerTask " + secondCounter);
+            if (DEBUG) Log.d(TAG, "OffTimerTask " + offTimerCount);
 
             //TextView tmp_textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
             if (textViewOffTimer != null && textViewOffTimer.getVisibility() != View.VISIBLE) {
@@ -404,9 +359,19 @@ public class MainActivity extends Activity {
             }
 
             if (textViewOffTimer != null) {
-                int min = secondCounter / 60;
-                int sec = secondCounter - 60 * min;
+                int min = offTimerCount / 60;
+                int sec = offTimerCount - 60 * min;
                 textViewOffTimer.setText(min + ":" + sec);
+            }
+
+            if (offTimerCount < 10 &&
+                    VolumeHelper.getCurrentVolumeInPercent(MainActivity.this) > VolumeHelper.MEDIUM_VOLUME_PERCENT) {
+                VolumeHelper.setMediumVolume(MainActivity.this);
+            }
+
+            if (offTimerCount < 5 &&
+                    VolumeHelper.getCurrentVolumeInPercent(MainActivity.this) > VolumeHelper.LOW_VOLUME_PERCENT) {
+                VolumeHelper.setLowVolume(MainActivity.this);
             }
         }
 
@@ -419,10 +384,9 @@ public class MainActivity extends Activity {
                 tmp_textViewOffTimer.setVisibility(View.INVISIBLE);
             }
 
-           /* if (player != null && player.isPlaying()) {
-                player.pause();
-                player.release();
-            }*/
+            stopService(new Intent(MainActivity.this, PlayerService.class));
+
+            finish();
         }
     }
 
@@ -483,6 +447,8 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Void... voids) {
+            Log.d(TAG, "UpdateWallpapersTask.onProgressUpdate");
+
             int newWallpaperID = WallpaperList.getRandWallpaperID(prevResID);
 
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), newWallpaperID);
@@ -527,15 +493,15 @@ public class MainActivity extends Activity {
                     //
                     break;
                 case R.id.timer_10:
-                    offTimerTask = new OffTimerTask(60);
+                    offTimerTask = new OffTimerTask(15);
                     offTimerTask.execute();
                     break;
                 case R.id.timer_20:
-                    offTimerTask = new OffTimerTask(120);
+                    offTimerTask = new OffTimerTask(12);
                     offTimerTask.execute();
                     break;
                 case R.id.timer_30:
-                    offTimerTask = new OffTimerTask(180);
+                    offTimerTask = new OffTimerTask(18);
                     offTimerTask.execute();
                     break;
                 default:
@@ -623,21 +589,22 @@ public class MainActivity extends Activity {
     class ButtonShowTrackListOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            AlertDialog.Builder builderSingle = new AlertDialog.Builder(MainActivity.this);
-            //builderSingle.setIcon(R.drawable.ic_launcher);
-            builderSingle.setTitle(R.string.select_track);
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                    MainActivity.this, android.R.layout.select_dialog_singlechoice);
+            AlertDialog.Builder trackListDialog = new AlertDialog.Builder(MainActivity.this);
+            trackListDialog.setCancelable(true);
+            //trackListDialog.setIcon(R.drawable.ic_launcher);
+            //trackListDialog.setTitle(R.string.select_track);
+            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_item);
+            //final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
 
 
-            for (HashMap<String, String> map: songsList) {
+            for (HashMap<String, String> map : songsList) {
                 arrayAdapter.add(map.get("songTitle"));
             }
             /*for (Track track : trackList.getTracks()) {
                 arrayAdapter.add(track.title);
             }*/
 
-            builderSingle.setNegativeButton(R.string.cancel,
+            trackListDialog.setNegativeButton(R.string.cancel,
                     new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -646,24 +613,44 @@ public class MainActivity extends Activity {
                     });
 
             int checkedItem = 0;//trackList.getCurrentTrackNum();
-            builderSingle.setSingleChoiceItems(arrayAdapter, checkedItem, new DialogInterface.OnClickListener() {
+            trackListDialog.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
                     String strName = arrayAdapter.getItem(i);
-                    trackList.setCurrentTrack(strName);
+                  /*  trackList.setCurrentTrack(strName);
 
                     TrackList.Track track = trackList.getCurrentTrack();
+*/
+                    playerService = new Intent(MainActivity.this, PlayerService.class);
+                    playerService.putExtra("songIndex", i);
+                    startService(playerService);
+
                     //player.createPlayer(track, true);
 
                     dialogInterface.dismiss();
                 }
             });
+        /*    trackListDialog.setSingleChoiceItems(arrayAdapter, checkedItem, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    String strName = arrayAdapter.getItem(i);
+                  *//*  trackList.setCurrentTrack(strName);
 
-            builderSingle.show();
+                    TrackList.Track track = trackList.getCurrentTrack();
+*//*
+                    playerService = new Intent(MainActivity.this, PlayerService.class);
+                    playerService.putExtra("songIndex", i);
+                    startService(playerService);
+
+                    //player.createPlayer(track, true);
+
+                    dialogInterface.dismiss();
+                }
+            });*/
+
+            trackListDialog.show();
         }
     }
-
-
 
 
     class UnpackTask extends AsyncTask<Void, Void, Void> {
@@ -672,7 +659,7 @@ public class MainActivity extends Activity {
             if (DEBUG) Log.i(TAG, "UnpackTask start");
 
             String path = MainActivity.this.getFilesDir() + "/";
-            for (TrackList.Track track:trackList.getTracks()) {
+            for (TrackList.Track track : trackList.getTracks(MainActivity.this)) {
                 if (isCancelled()) return null;
 
                 if (track.typeID == TrackList.Track.INTERNAL) {
@@ -720,38 +707,61 @@ public class MainActivity extends Activity {
             /*File file = new File("android.resource://" + MainActivity.this.getPackageName() + "/raw/" + R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
             if (DEBUG) Log.e(TAG, "MD5 " + MD5Helper.calculateMD5(file));*/
 
+            // Prepare
             InternetHelper.trustEveryone();
 
             final File availablePath = FileHelper.getAvailablePath(MainActivity.this);
-            final File trackListFile = new File(availablePath, "tracklist.txt");
+            File trackListFile = new File(availablePath, "tracklist.txt");
 
 
             final Download downloadTrackListFile = new Download(String.format(HTTPS_DRIVE_GOOGLE_COM, DRIVE_GOOGLE_MAIN_FILE_ID), trackListFile);
             downloadTrackListFile.setOnCompleteListener(new Download.ActionOnCompleteListener() {
                 @Override
-                public void onComplete(Boolean isCompleteOk) {
+                public void onComplete(Boolean isCompleteOk, File outputFile) {
                     if (isCancelled()) return;
 
                     if (DEBUG) Log.w(TAG, "DOWNLOAD COMPLETE !!! " + isCompleteOk);
 
                     if (isCompleteOk) {
+                        if (DEBUG) Log.w(TAG, "trackListFile.getPath() " + outputFile.getPath());
+                        if (DEBUG)
+                            Log.w(TAG, "trackListFile.getAbsolutePath() " + outputFile.getAbsolutePath());
+                        //if (DEBUG) Log.w(TAG, "trackListFile.getCanonicalPath() " + trackListFile.getCanonicalPath());
+                        preferencesHelper.setString("trackListPath", outputFile.getPath());
+
+                        // Step 1. Tracklist loaded. Need parse
                         ArrayList<TrackList.DownloadedTrackItem> downloadedTrackItems = new ArrayList<TrackList.DownloadedTrackItem>();
 
-                        ArrayList<String> strings = FileHelper.getLinesFromFile(trackListFile);
+                        ArrayList<String> strings = FileHelper.getLinesFromFile(outputFile);
                         for (String line : strings) {
                             if (DEBUG) Log.w(TAG, "line " + line);
                             downloadedTrackItems.add(new TrackList.DownloadedTrackItem(line));
                         }
 
-                        for (TrackList.DownloadedTrackItem downloadedTrackItem : downloadedTrackItems) {
-                            Download downloadTrack = new Download(String.format(HTTPS_DRIVE_GOOGLE_COM,
+                        for (final TrackList.DownloadedTrackItem downloadedTrackItem : downloadedTrackItems) {
+                            if (preferencesHelper.getString(downloadedTrackItem.md5, null) != null) {
+                                if (DEBUG)
+                                    Log.i(TAG, "file already exist = " + downloadedTrackItem.md5);
+                                continue;
+                            }
+
+
+                            // Step 2. Load every track from list
+                            final Download downloadTrack = new Download(String.format(HTTPS_DRIVE_GOOGLE_COM,
                                     downloadedTrackItem.googleDriveID),
                                     new File(availablePath, downloadedTrackItem.md5 + ".mp3"));
 
                             downloadTrack.setOnCompleteListener(new Download.ActionOnCompleteListener() {
                                 @Override
-                                public void onComplete(Boolean isCompleteOk) {
+                                public void onComplete(Boolean isCompleteOk, File outputFile) {
+                                    if (isCancelled()) return;
+
                                     if (isCompleteOk) {
+                                        String md5 = MD5Helper.calculateMD5(outputFile);
+
+                                        if (downloadedTrackItem.md5.equals(md5)) {
+                                            preferencesHelper.setString(md5, "OK");
+                                        }
 
 
                                     }
@@ -811,7 +821,8 @@ public class MainActivity extends Activity {
     class SaveThisObjects {
         //public Player player;
         //public UpdateTrackPosTask updateTrackPosTask;
-        //public OffTimerTask offTimerTask;
+
+        public int offTimerCount;
         public TrackList trackList;
     }
 }

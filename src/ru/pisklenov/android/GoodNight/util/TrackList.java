@@ -1,5 +1,7 @@
 package ru.pisklenov.android.GoodNight.util;
 
+import android.content.Context;
+
 import java.util.ArrayList;
 
 import ru.pisklenov.android.GoodNight.R;
@@ -11,8 +13,8 @@ public class TrackList {
     private ArrayList<Track> tracks;
     private int currentTrackNum;
 
-    public TrackList(int initTrack) {
-        this.tracks = getTracks();
+    public TrackList(Context context, int initTrack) {
+        this.tracks = getTracks(context);
         this.currentTrackNum = initTrack;
     }
 
@@ -42,7 +44,7 @@ public class TrackList {
         return tracks.get(currentTrackNum);
     }
 
-    public void setCurrentTrack(String name) {
+    /*public void setCurrentTrack(String name) {
         currentTrackNum = 0;
         for (Track track: getTracks()) {
             if (name.equals(track.title)) {
@@ -50,16 +52,24 @@ public class TrackList {
             }
             currentTrackNum++;
         }
-    }
+    }*/
 
-    public ArrayList<Track> getTracks() {
+    public ArrayList<Track> getTracks(Context context) {
         ArrayList<Track> arrayList = new ArrayList<Track>();
 
-        arrayList.add(new Track("maid_with_the_flaxen_hair", R.raw.maid_with_the_flaxen_hair));
-        arrayList.add(new Track("sleep_away.mp3", R.raw.sleep_away));
-        arrayList.add(new Track("johann_sebastian_bach_minuet_in_g_from_anna_magdalena.mp3", R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena));
-        arrayList.add(new Track("johannes_brahms_waltz_no_15",R.raw.johannes_brahms_waltz_no_15));
-        arrayList.add(new Track("robert_schumann_kinderscene_op_15",R.raw.robert_schumann_kinderscene_op_15));
+        arrayList.add(new Track(context.getString(R.string.antonin_dvorak_symphony_no_9), R.raw.antonin_dvorak_symphony_no_9));
+        arrayList.add(new Track(context.getString(R.string.antonio_vivaldi_winter), R.raw.antonio_vivaldi_winter));
+        arrayList.add(new Track(context.getString(R.string.johann_pachelbel_canon), R.raw.johann_pachelbel_canon));
+        arrayList.add(new Track(context.getString(R.string.johann_sebastian_bach_minuet_in_g), R.raw.johann_sebastian_bach_minuet_in_g));
+        arrayList.add(new Track(context.getString(R.string.johann_sebastian_bach_suite_no_3), R.raw.johann_sebastian_bach_suite_no_3));
+
+        arrayList.add(new Track(context.getString(R.string.johannes_brahms_waltz_no_15), R.raw.johannes_brahms_waltz_no_15));
+        arrayList.add(new Track(context.getString(R.string.ludwig_van_beethoven_sonata_no_14), R.raw.ludwig_van_beethoven_sonata_no_14));
+        arrayList.add(new Track(context.getString(R.string.ludwig_van_beethoven_sonata_no_8), R.raw.ludwig_van_beethoven_sonata_no_8));
+        arrayList.add(new Track(context.getString(R.string.robert_schumann_kinderscene_op_15), R.raw.robert_schumann_kinderscene_op_15));
+        arrayList.add(new Track(context.getString(R.string.wolfgang_amadeus_mozart_piano_sonata_in_c), R.raw.wolfgang_amadeus_mozart_piano_sonata_in_c));
+        arrayList.add(new Track(context.getString(R.string.wolfgang_amadeus_mozart_twinkle), R.raw.wolfgang_amadeus_mozart_twinkle));
+
 
         /*arrayList.add(new Track("Jungle 1", R.raw.jungle_01));
         arrayList.add(new Track("Jungle 2", R.raw.jungle_02));

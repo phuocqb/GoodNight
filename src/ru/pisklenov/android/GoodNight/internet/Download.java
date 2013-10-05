@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+
 import javax.net.ssl.HttpsURLConnection;
 
 import ru.pisklenov.android.GoodNight.GN;
@@ -40,7 +41,7 @@ public class Download {
 
     private void onComplete(Boolean isCompleteOk) {
         if (onCompleteListener != null) {
-            onCompleteListener.onComplete(isCompleteOk);
+            onCompleteListener.onComplete(isCompleteOk, outputFile);
         }
     }
 
@@ -112,7 +113,7 @@ public class Download {
             e.printStackTrace();
         } catch (IOException e) {
             if (DEBUG) Log.e(TAG, "IOException " + e.getMessage());
-            if (DEBUG) Log.e(TAG, "IOException " + e.getLocalizedMessage());
+            //if (DEBUG) Log.e(TAG, "IOException " + e.getLocalizedMessage());
 
             e.printStackTrace();
         }
@@ -122,6 +123,6 @@ public class Download {
 
 
     public interface ActionOnCompleteListener {
-        public void onComplete(Boolean isCompleteOk);
+        public void onComplete(Boolean isCompleteOk, File outputFile);
     }
 }

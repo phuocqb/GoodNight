@@ -24,4 +24,19 @@
 
     <string name="phone_control_mute_on">Mute incoming calls</string>
     <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling</string>
+
+    <string name="default_string_value">--</string>
+
+    <string name="wolfgang_amadeus_mozart_twinkle">Wolfgang Amadeus Mozart - Variations (Twinkle, Twinkle)</string>
+    <string name="johann_sebastian_bach_minuet_in_g">Johann Sebastian Bach - Minuet in G from Anna Magdalena</string>
+    <string name="wolfgang_amadeus_mozart_piano_sonata_in_c">Wolfgang Amadeus Mozart - Piano Sonata in C</string>
+    <string name="johann_pachelbel_canon">Johann Pachelbel - Canon</string>
+    <string name="ludwig_van_beethoven_sonata_no_14">Ludwig van Beethoven - Sonata No. 14</string>
+    <string name="antonin_dvorak_symphony_no_9">Antonin Dvorak - Symphony No. 9, New World</string>
+    <string name="antonio_vivaldi_winter">Antonio Vivaldi - The Four Seasons \'Winter\'</string>
+    <string name="johann_sebastian_bach_suite_no_3">Johann Sebastian Bach - Orchestral Suite No. 3 In D</string>
+
+    <string name="ludwig_van_beethoven_sonata_no_8">Ludwig van Beethoven - Sonata No. 8, Op. 13 \'Pathetique\'</string>
+    <string name="robert_schumann_kinderscene_op_15">Robert Schumann - Kinderscene Op. 15</string>
+    <string name="johannes_brahms_waltz_no_15">Johannes Brahms - Waltz No. 15</string>
 </resources>

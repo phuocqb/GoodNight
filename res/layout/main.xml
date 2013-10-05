@@ -27,7 +27,7 @@
         <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="@string/default_string_value"
             android:id="@+id/textViewTitle"
             android:layout_alignParentLeft="false"
             android:layout_alignParentBottom="false"
@@ -41,7 +41,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="@string/default_string_value"
             android:id="@+id/textViewSongCurrentDuration"
             android:layout_alignParentRight="false"
             android:layout_below="@+id/textViewTitle"
@@ -50,7 +50,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
+            android:text="@string/default_string_value"
             android:id="@+id/textViewTotalDuration"
             android:layout_below="@+id/textViewTitle"
             android:layout_alignParentRight="true" />
