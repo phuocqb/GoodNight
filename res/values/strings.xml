@@ -1,33 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GoodNight</string>
+    <string name="app_name">Good night, little Mozart</string>
 
-    <string name="button_play">Play</string>
-    <string name="button_pause">Pause</string>
-    <string name="button_next">Next</string>
-    <string name="button_prev">Prev</string>
-
+    <string name="menu_timer_off_title">Timer options</string>
     <string name="timer_off">Off</string>
     <string name="timer_10">Turn off after 10 min</string>
     <string name="timer_20">Turn off after 20 min</string>
     <string name="timer_30">Turn off after 30 min</string>
 
-    <string name="select_track">Select track</string>
-
-    <string name="cancel">Cancel</string>
-
     <string name="menu_about_title">About</string>
-    <string name="menu_about_message">Good night. Classic \nAuthor and developer: Pisklenov Andrei \nContent and translation: Pisklenova Marina \nIf you like it, try our other apps </string>
+    <string name="menu_about_message">Good night, little Mozart \nAuthor and developer: Pisklenov Andrei \nInspiration: Pisklenova Marina \nIf you like it, try our other apps </string>
+    <string name="button_visit">More our apps</string>
+
     <string name="menu_help_title">Help</string>
-    <string name="menu_help_message">Help This is me-me-me application :3 </string>
+    <string name="menu_help_message">Application \"Good night, little Mozart\" is always ready to help you together with such famous composers as Mozart, Bach, Beethoven, Vivaldi and Brahms.  Calming and relaxing classical music will give your baby the best dreams, full of joy, love, peace and warm-heartedness. Bring up your child to love musical masterpieces and enjoy world\'s cultural heritage. Who knows, maybe one day he will write his own symphony!</string>
 
-    <string name="menu_phone_control_title">What me do with incoming calls</string>
-    <string name="menu_timer_off_title">Create timer</string>
-
+    <string name="menu_phone_control_title">What to do with incoming calls</string>
     <string name="phone_control_mute_on">Mute incoming calls</string>
-    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling</string>
+    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling with no sound</string>
 
-    <string name="default_string_value">--</string>
+
+    <string name="select_track">Select track</string>
 
     <string name="wolfgang_amadeus_mozart_twinkle">Wolfgang Amadeus Mozart - Variations (Twinkle, Twinkle)</string>
     <string name="johann_sebastian_bach_minuet_in_g">Johann Sebastian Bach - Minuet in G from Anna Magdalena</string>
@@ -37,10 +30,12 @@
     <string name="antonin_dvorak_symphony_no_9">Antonin Dvorak - Symphony No. 9, New World</string>
     <string name="antonio_vivaldi_winter">Antonio Vivaldi - The Four Seasons \'Winter\'</string>
     <string name="johann_sebastian_bach_suite_no_3">Johann Sebastian Bach - Orchestral Suite No. 3 In D</string>
-
     <string name="ludwig_van_beethoven_sonata_no_8">Ludwig van Beethoven - Sonata No. 8, Op. 13 \'Pathetique\'</string>
     <string name="robert_schumann_kinderscene_op_15">Robert Schumann - Kinderscene Op. 15</string>
     <string name="johannes_brahms_waltz_no_15">Johannes Brahms - Waltz No. 15</string>
-    <string name="button_visit">Visit...</string>
+
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="default_string_value">--</string>
 </resources>

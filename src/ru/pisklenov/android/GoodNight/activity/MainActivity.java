@@ -50,7 +50,8 @@ public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
-    private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/apps/details?id=Andrei%20Pisklenov";
+    private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
+    private static final String MARKET_LINK = "market://search?q=pub:Andrei Pisklenov";
     //private static final String GOOGLE_PLAY_LINK = "market://search?q=pub:Andrei Pisklenov";
 
     public static ImageButton imageButtonPlay;
@@ -257,12 +258,15 @@ public class MainActivity extends Activity {
                         .setPositiveButton(R.string.button_visit, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK));
-                                startActivity(browserIntent);
+                                /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK));
+                                startActivity(browserIntent);*/
 
-                                //if (Build.VERSION.SDK_INT == 10)
-                               /* final Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_LINK));
-                                MainActivity.this.startActivity(intent);*/
+                                try {
+                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(MARKET_LINK)));
+                                } catch (android.content.ActivityNotFoundException e) {
+                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_LINK)));
+                                }
+
                             }
                         })
                         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -470,15 +474,15 @@ public class MainActivity extends Activity {
                     //
                     break;
                 case R.id.timer_10:
-                    offTimerTask = new OffTimerTask(15);
+                    offTimerTask = new OffTimerTask(10*60);
                     offTimerTask.execute();
                     break;
                 case R.id.timer_20:
-                    offTimerTask = new OffTimerTask(12);
+                    offTimerTask = new OffTimerTask(20*60);
                     offTimerTask.execute();
                     break;
                 case R.id.timer_30:
-                    offTimerTask = new OffTimerTask(18);
+                    offTimerTask = new OffTimerTask(30*60);
                     offTimerTask.execute();
                     break;
                 default:
