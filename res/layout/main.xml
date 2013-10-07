@@ -14,7 +14,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/title_background">
+        android:background="@drawable/style_title_background">
 
         <ImageButton
             android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
             android:id="@+id/imageButtonTrackList"
             android:layout_alignParentRight="false"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/list2" />
+            android:background="@drawable/button_list" />
 
         <TextView
             android:layout_width="fill_parent"
@@ -71,8 +71,8 @@
         android:id="@+id/imageButtonTimer"
         android:layout_above="@+id/textViewOffTimer"
         android:layout_alignParentRight="true"
-        android:background="@drawable/button_background_selector"
-        android:src="@drawable/clock"
+        android:background="@drawable/style_button_background_selector"
+        android:src="@drawable/button_clock"
         android:scaleType="fitXY" />
 
     <ImageButton
@@ -81,8 +81,8 @@
         android:id="@+id/imageButtonPlay"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/button_background_selector"
-        android:src="@drawable/play" />
+        android:background="@drawable/style_button_background_selector"
+        android:src="@drawable/button_play" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -91,8 +91,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_toRightOf="@+id/imageButtonPlay"
-        android:background="@drawable/button_background_selector"
-        android:src="@drawable/next" />
+        android:background="@drawable/style_button_background_selector"
+        android:src="@drawable/button_next" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -101,13 +101,13 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_toLeftOf="@+id/imageButtonPlay"
-        android:background="@drawable/button_background_selector"
-        android:src="@drawable/previous" />
+        android:background="@drawable/style_button_background_selector"
+        android:src="@drawable/button_previous" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Text"
+        android:text="@string/default_string_value"
         android:id="@+id/textViewOffTimer"
         android:layout_above="@+id/imageButtonNext"
         android:layout_alignParentRight="true"
@@ -117,7 +117,7 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:id="@+id/imageButtonPhoneControl"
-        android:background="@drawable/button_background_selector"
+        android:background="@drawable/style_button_background_selector"
         android:src="@drawable/phone_mute"
         android:scaleType="fitXY"
         android:layout_alignTop="@+id/imageButtonTimer" />

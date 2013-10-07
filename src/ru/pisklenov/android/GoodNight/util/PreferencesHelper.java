@@ -7,11 +7,11 @@ import android.content.SharedPreferences;
  * Created by anpi0413 on 17.09.13.
  */
 public class PreferencesHelper {
-    public static final String PREFS_NAME = PreferencesHelper.class.getName();
-    static final boolean DEFAULT_BOOLEAN = false;
-    static final String DEFAULT_STRING = "";
+    private static final String PREFS_NAME = PreferencesHelper.class.getName();
+    private static final boolean DEFAULT_BOOLEAN = false;
+    private static final String DEFAULT_STRING = "";
 
-    Context context;
+    private Context context;
 
     public PreferencesHelper(Context context) {
         this.context = context;

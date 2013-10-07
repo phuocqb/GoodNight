@@ -17,7 +17,9 @@
     <string name="cancel">Cancel</string>
 
     <string name="menu_about_title">About</string>
-    <string name="menu_about">This is me-me-me application :3 </string>
+    <string name="menu_about_message">About This is me-me-me application :3 </string>
+    <string name="menu_help_title">Help</string>
+    <string name="menu_help_message">Help This is me-me-me application :3 </string>
 
     <string name="menu_phone_control_title">What me do with incoming calls</string>
     <string name="menu_timer_off_title">Create timer</string>

@@ -611,7 +611,7 @@ public class MenuBuilder implements Menu {
      */
     private void onItemsChanged(boolean cleared) {
         if (!mPreventDispatchingItemsChanged) {
-            if (mIsVisibleItemsStale == false) mIsVisibleItemsStale = true;
+            if (!mIsVisibleItemsStale) mIsVisibleItemsStale = true;
         }
     }
 

@@ -5,7 +5,9 @@
     android:versionName="1.0"
     android:installLocation="preferExternal">
 
-    <uses-sdk android:minSdkVersion="10" />
+    <uses-sdk
+        android:minSdkVersion="10"
+        android:targetSdkVersion="16"/>
 
     <!-- <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" />-->
     <uses-permission android:name="android.permission.CALL_PHONE" />
@@ -16,12 +18,15 @@
     <application
         android:label="@string/app_name"
         android:name=".GN"
-        android:debuggable="true">
+        android:icon="@drawable/app_ico"
+        android:allowBackup="true">
 
 
         <activity
             android:name=".activity.MainActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:icon="@drawable/app_ico">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -38,6 +43,6 @@
 
 
         <!--<service android:name=".player.service.PlayerSrv" />-->
-        <service android:name=".util.PlayerService" />
+        <service android:name=".play.PlayerService" />
     </application>
 </manifest> 

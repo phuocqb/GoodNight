@@ -1,12 +1,8 @@
 package ru.pisklenov.android.GoodNight.play;
 
-import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -18,21 +14,13 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.activity.MainActivity;
-import ru.pisklenov.android.GoodNight.util.TrackList;
 import ru.pisklenov.android.GoodNight.util.Utilities;
 
 public class PlayerService extends Service implements MediaPlayer.OnCompletionListener,
@@ -99,9 +87,9 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 //songTitleLabel.get().setText(songsListingSD.get(currentSongIndex).get("songTitle"));
 
                 if (mp.isPlaying())
-                    btnPlay.get().setImageResource(R.drawable.pause);
+                    btnPlay.get().setImageResource(R.drawable.button_pause);
                 else
-                    btnPlay.get().setImageResource(R.drawable.play);
+                    btnPlay.get().setImageResource(R.drawable.button_play);
             } else {
                 //currentSongIndex = 0;
                 //songTitleLabel.get().setText(trackList.getTracks().get(currentSongIndex).title);
@@ -157,7 +145,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                         if (mp != null) {
                             mp.pause();
                             // Changing button image to play button
-                            btnPlay.get().setImageResource(R.drawable.play);
+                            btnPlay.get().setImageResource(R.drawable.button_play);
                             Log.d(TAG, "Pause");
 
                         }
@@ -165,8 +153,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                         // Resume song
                         if (mp != null) {
                             mp.start();
-                            // Changing button image to pause button
-                            btnPlay.get().setImageResource(R.drawable.pause);
+                            // Changing button image to button_pause button
+                            btnPlay.get().setImageResource(R.drawable.button_pause);
                             Log.d(TAG, "Play");
                         }
                     }
@@ -177,7 +165,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 break;
 
             case R.id.imageButtonNext:
-                // check if next song is there or not
+                // check if button_next song is there or not
                 Log.d(TAG, "Next");
 
 
@@ -332,8 +320,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             //String songTitle = songsListingSD.get(songIndex).get("songTitle");
 
             songTitleLabel.get().setText(songTitle);
-            // Changing Button Image to pause image
-            btnPlay.get().setImageResource(R.drawable.pause);
+            // Changing Button Image to button_pause image
+            btnPlay.get().setImageResource(R.drawable.button_pause);
             // set Progress bar values
             songProgressBar.get().setProgress(0);
             songProgressBar.get().setMax(100);
@@ -402,7 +390,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
             playSong(currentSongIndex);
         } else {
-            // no repeat or shuffle ON - play next song
+            // no repeat or shuffle ON - play button_next song
 
 
             if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {

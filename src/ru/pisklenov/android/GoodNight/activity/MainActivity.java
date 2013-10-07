@@ -37,10 +37,10 @@ import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
 import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
-import ru.pisklenov.android.GoodNight.util.Player;
-import ru.pisklenov.android.GoodNight.util.PlayerService;
+import ru.pisklenov.android.GoodNight.play.Player;
+import ru.pisklenov.android.GoodNight.play.PlayerService;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
-import ru.pisklenov.android.GoodNight.util.TrackList;
+import ru.pisklenov.android.GoodNight.play.TrackList;
 import ru.pisklenov.android.GoodNight.util.VolumeHelper;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
@@ -67,7 +67,7 @@ public class MainActivity extends Activity {
 
     public static TrackList trackList;
     //Player player;
-
+    AlertDialog.Builder trackListDialog;
 
     OffTimerTask offTimerTask;
     UpdateWallpapersTask updateWallpapersTask;
@@ -163,6 +163,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
 
         initViews();
 
@@ -170,23 +171,28 @@ public class MainActivity extends Activity {
         imageButtonTimer.setOnClickListener(new ButtonTimerOnClickListener());
         imageButtonTrackList.setOnClickListener(new ButtonShowTrackListOnClickListener());
 
-        if (DEBUG) Log.w(TAG, "MainActivity.onCreate()");
 
-        //new UnpackTask().execute();
+        // set min volume
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-       /* File file = new File("file:///android_asset/jungle_02.mp3");
-        if(file.exists()) {
-            Log.e(TAG, "file.exists() " + "file:///android_asset/jungle_02.mp3");
-        } else {
-            Log.e(TAG, "!!!file.exists() " + "file:///android_asset/jungle_02.mp3");
-        }*/
 
-        if (trackList == null) {
-            trackList = new TrackList(MainActivity.this, 0);
+        SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
+        if (saveThisObjects != null && saveThisObjects.offTimerCount != 0) {
+            offTimerTask = new OffTimerTask(saveThisObjects.offTimerCount);
+            offTimerTask.execute();
         }
 
-        /*SongsProvider plm = new SongsProvider(MainActivity.this);
-        songsList = plm.getPlayList();*/
+        if (saveThisObjects != null && saveThisObjects.trackList != null) {
+            trackList = saveThisObjects.trackList;
+        } else {
+            if (trackList == null) trackList = new TrackList(MainActivity.this, 0);
+        }
+
+        if (saveThisObjects != null && saveThisObjects.trackListDialog != null) {
+            trackListDialog = saveThisObjects.trackListDialog;
+        }
+
+
 
         // create preferences class
         preferencesHelper = new PreferencesHelper(MainActivity.this);
@@ -198,64 +204,11 @@ public class MainActivity extends Activity {
 
         }
 
-        // set min volume
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        //audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (int) Math.round(maxVolume * 0.2), 0);
-
-        Log.d(TAG, String.valueOf(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)));
-        Log.d(TAG, String.valueOf((int) Math.round(maxVolume * 0.2)));
-
-
         playerService = new Intent(this, PlayerService.class);
         playerService.putExtra("songIndex", PlayerService.currentSongIndex);
         startService(playerService);
 
-
         //new DownloadTask().execute();
-
-
-        SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
-        if (saveThisObjects != null && saveThisObjects.offTimerCount != 0) {
-            offTimerTask = new OffTimerTask(saveThisObjects.offTimerCount);
-            offTimerTask.execute();
-        }
-
-
-
-
-
-        /*SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
-        if (saveThisObjects != null && saveThisObjects.trackList != null) {
-            trackList = saveThisObjects.trackList;
-        } else {
-            trackList = new TrackList(0);
-        }*/
-
-        /*if (saveThisObjects != null && saveThisObjects.player != null) {
-            player = saveThisObjects.player;
-        } else {
-            player = new Player(MainActivity.this);
-            Track track = trackList.getCurrentTrack();
-            player.createPlayer(track);
-
-            textViewTitle.setText(track.title);
-        }
-
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                imageButtonNext.performClick();
-            }
-        });
-        player.setTrackChangeEventListener(new Player.OnTrackChangeEventListener() {
-            @Override
-            public void onEvent(Object o) {
-                textViewTitle.setText(((Track) o).title);
-            }
-        });*/
     }
 
     private void initViews() {
@@ -276,16 +229,22 @@ public class MainActivity extends Activity {
         seekBar = (SeekBar) findViewById(R.id.seekBar);
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.help:
+                //newGame();
+                return true;
+            case R.id.about:
+               // showHelp();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
-  /*  // -- Cancel Notification
-    public void cancelNotification() {
-        String notificationServiceStr = Context.NOTIFICATION_SERVICE;
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(notificationServiceStr);
-        mNotificationManager.cancel(PlayerService.NOTIFICATION_ID);
-    }*/
-
-
-    private Player getPlayer() {
+    /*private Player getPlayer() {
         Player player = new Player(MainActivity.this);
 
         player.createPlayer(trackList.getCurrentTrack(), false);
@@ -293,7 +252,7 @@ public class MainActivity extends Activity {
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
-                if (DEBUG) Log.i(TAG, "player.OnCompletionListener() go next track");
+                if (DEBUG) Log.i(TAG, "player.OnCompletionListener() go button_next track");
                 imageButtonNext.performClick();
             }
         });
@@ -306,28 +265,12 @@ public class MainActivity extends Activity {
         });
 
         return player;
-    }
+    }*/
 
-
-    @Override
-    public Object onRetainNonConfigurationInstance() {
-        SaveThisObjects saveThisObjects = new SaveThisObjects();
-
-        // saveThisObjects.player = player;
-        saveThisObjects.offTimerCount = offTimerCount;
-        //saveThisObjects.updateTrackPosTask = updateTrackPosTask;
-        saveThisObjects.trackList = trackList;
-
-        return saveThisObjects;
-    }
 
     class OffTimerTask extends AsyncTask<Void, Void, Void> implements Serializable {
-        //int secondCounter; // ony seconds
-        //Context context;
-
         OffTimerTask(int secondCounter) {
             offTimerCount = secondCounter;
-            //this.secondCounter = secondCounter;
         }
 
         @Override
@@ -390,7 +333,7 @@ public class MainActivity extends Activity {
         }
     }
 
-   /* class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
+    /* class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
             while (!isCancelled()) {
@@ -510,62 +453,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    /*class ButtonPlayOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            if (!player.isLoading && !player.isPlaying()) {
-                TrackList.Track track = trackList.getCurrentTrack();
-                player.createPlayer(track, true);
-
-                return;
-            }
-
-            if (player.isPlaying()) {
-                player.pause();
-
-                ((ImageView) view).setImageResource(R.drawable.play);
-                //view.setBackgroundResource(R.drawable.play);
-                Log.i(TAG, "pause");
-            } else {
-                player.start();
-
-                ((ImageView) view).setImageResource(R.drawable.pause);
-                //view.setBackgroundResource(R.drawable.pause);
-                Log.i(TAG, "start");
-            }
-        }
-    }*/
-
-   /* class ButtonNextOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            Log.i(TAG, "next");
-
-            //player.release();
-            if (player != null) {
-                player.createPlayer(trackList.getNextTrack(), false);
-                imageButtonPlay.performClick();
-            }
-           *//* Track track = trackList.getNextTrack();
-            player.playTrack(track);*//*
-        }
-    }*/
-
-    /*class ButtonPrevOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            Log.i(TAG, "prev");
-
-            //player.release();
-            if (player != null) {
-                player.createPlayer(trackList.getPrevTrack(), false);
-                imageButtonPlay.performClick();
-            }
-            *//*Track track = trackList.getPrevTrack();
-            player.playTrack(track);*//*
-        }
-    }*/
-
     class ButtonTimerOnClickListener implements Button.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -589,7 +476,7 @@ public class MainActivity extends Activity {
     class ButtonShowTrackListOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
-            AlertDialog.Builder trackListDialog = new AlertDialog.Builder(MainActivity.this);
+            trackListDialog = new AlertDialog.Builder(MainActivity.this);
             trackListDialog.setCancelable(true);
             //trackListDialog.setIcon(R.drawable.ic_launcher);
             //trackListDialog.setTitle(R.string.select_track);
@@ -649,45 +536,6 @@ public class MainActivity extends Activity {
             });*/
 
             trackListDialog.show();
-        }
-    }
-
-
-    class UnpackTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            if (DEBUG) Log.i(TAG, "UnpackTask start");
-
-            String path = MainActivity.this.getFilesDir() + "/";
-            for (TrackList.Track track : trackList.getTracks(MainActivity.this)) {
-                if (isCancelled()) return null;
-
-                if (track.typeID == TrackList.Track.INTERNAL) {
-
-                    if (!FileHelper.isFileExists(path + track.pathToFile)) {
-                        FileHelper.copyFromResToInternal(MainActivity.this, track.resID, path + track.pathToFile);
-                    }
-                }
-            }
-
-            /*HashMap<String, Integer> internalTracks = new HashMap<String, Integer>();
-            String path = MainActivity.this.getFilesDir() + "/";
-            internalTracks.put(path + "maid_with_the_flaxen_hair.mp3", R.raw.maid_with_the_flaxen_hair);
-            internalTracks.put(path + "sleep_away.mp3", R.raw.sleep_away);
-            internalTracks.put(path + "johann_sebastian_bach_minuet_in_g_from_anna_magdalena.mp3", R.raw.johann_sebastian_bach_minuet_in_g_from_anna_magdalena);
-            internalTracks.put(path + "johannes_brahms_waltz_no_15.mp3", R.raw.johannes_brahms_waltz_no_15);
-            internalTracks.put(path + "robert_schumann_kinderscene_op_15.mp3", R.raw.robert_schumann_kinderscene_op_15);
-
-            for(Map.Entry<String, Integer> entry: internalTracks.entrySet()) {
-                if (isCancelled()) return null;
-
-                if (!FileHelper.isFileExists(entry.getKey())) {
-                    FileHelper.copyFromResToInternal(MainActivity.this, entry.getValue(), entry.getKey());
-                }
-            }*/
-
-            if (DEBUG) Log.i(TAG, "UnpackTask finish");
-            return null;
         }
     }
 
@@ -775,17 +623,9 @@ public class MainActivity extends Activity {
             });
             downloadTrackListFile.startDownload();
 
-
             return null;
         }
-
-        @Override
-        protected void onProgressUpdate(Void... voids) {
-
-        }
     }
-
-
 
     /* private class ListenToPhoneState extends PhoneStateListener {
         int currentRingerMode;
@@ -818,11 +658,26 @@ public class MainActivity extends Activity {
         }
     }*/
 
+    @Override
+    public Object onRetainNonConfigurationInstance() {
+        SaveThisObjects saveThisObjects = new SaveThisObjects();
+
+        // saveThisObjects.updateTrackPosTask = updateTrackPosTask;
+        // saveThisObjects.player = player;
+
+        saveThisObjects.offTimerCount = offTimerCount;
+        saveThisObjects.trackList = trackList;
+        saveThisObjects.trackListDialog = trackListDialog;
+
+        return saveThisObjects;
+    }
+
     class SaveThisObjects {
         //public Player player;
         //public UpdateTrackPosTask updateTrackPosTask;
 
         public int offTimerCount;
         public TrackList trackList;
+        public AlertDialog.Builder trackListDialog;
     }
 }
