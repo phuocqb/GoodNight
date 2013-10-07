@@ -17,7 +17,7 @@
     <string name="cancel">Cancel</string>
 
     <string name="menu_about_title">About</string>
-    <string name="menu_about_message">About This is me-me-me application :3 </string>
+    <string name="menu_about_message">Good night. Classic \nAuthor and developer: Pisklenov Andrei \nContent and translation: Pisklenova Marina \nIf you like it, try our other apps </string>
     <string name="menu_help_title">Help</string>
     <string name="menu_help_message">Help This is me-me-me application :3 </string>
 
@@ -41,4 +41,6 @@
     <string name="ludwig_van_beethoven_sonata_no_8">Ludwig van Beethoven - Sonata No. 8, Op. 13 \'Pathetique\'</string>
     <string name="robert_schumann_kinderscene_op_15">Robert Schumann - Kinderscene Op. 15</string>
     <string name="johannes_brahms_waltz_no_15">Johannes Brahms - Waltz No. 15</string>
+    <string name="button_visit">Visit...</string>
+    <string name="ok">OK</string>
 </resources>

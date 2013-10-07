@@ -71,17 +71,22 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     // --------------onStartCommand-----------------------------------------//
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (DEBUG) Log.i(TAG, " -- PlayerService.onStartCommand()");
+        if (DEBUG) Log.w(TAG, " -- PlayerService.onStartCommand()");
 
         initUI();
         int songIndex = intent.getIntExtra("songIndex", 0);
         if (songIndex != currentSongIndex) {
+            if (DEBUG) Log.w(TAG, "songIndex != currentSongIndex");
+            if (DEBUG) Log.w(TAG, "songIndex == " + songIndex + " currentSongIndex == " + currentSongIndex);
+
             playSong(songIndex);
             //initNotification(songIndex);
             currentSongIndex = songIndex;
         } else {
-            if (currentSongIndex != -1) {
+            if (DEBUG) Log.w(TAG, "songIndex == currentSongIndex");
 
+            if (currentSongIndex != -1) {
+                if (DEBUG) Log.w(TAG, "currentSongIndex != -1");
 
                 songTitleLabel.get().setText(trackList.getTracks(getApplicationContext()).get(currentSongIndex).title);
                 //songTitleLabel.get().setText(songsListingSD.get(currentSongIndex).get("songTitle"));
@@ -91,6 +96,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 else
                     btnPlay.get().setImageResource(R.drawable.button_play);
             } else {
+                if (DEBUG) Log.w(TAG, "currentSongIndex == -1");
                 //currentSongIndex = 0;
                 //songTitleLabel.get().setText(trackList.getTracks().get(currentSongIndex).title);
             }

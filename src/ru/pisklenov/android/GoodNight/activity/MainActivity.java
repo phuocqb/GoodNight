@@ -9,7 +9,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -48,6 +50,9 @@ public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
+    private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/apps/details?id=Andrei%20Pisklenov";
+    //private static final String GOOGLE_PLAY_LINK = "market://search?q=pub:Andrei Pisklenov";
+
     public static ImageButton imageButtonPlay;
     public static ImageButton imageButtonNext;
     public static ImageButton imageButtonPrev;
@@ -67,7 +72,8 @@ public class MainActivity extends Activity {
 
     public static TrackList trackList;
     //Player player;
-    AlertDialog.Builder trackListDialog;
+    //AlertDialog.Builder trackListDialog = null;
+    boolean isTrackListDialogShowing = false;
 
     OffTimerTask offTimerTask;
     UpdateWallpapersTask updateWallpapersTask;
@@ -102,18 +108,15 @@ public class MainActivity extends Activity {
         if (DEBUG) Log.w(TAG, "MainActivity.onDestroy()");
 
         //if (!PlayerService.mp.isPlaying()) {
-            stopService(new Intent(MainActivity.this, PlayerService.class));
-            //stopService(playerService);
-            //cancelNotification();
-       // }
 
-        /*if (playerService != null) {
-            stopService(playerService);
-        }*/
 
-      /*  if (player != null) {
-            player.release();
-        }*/
+        // stopService(new Intent(MainActivity.this, PlayerService.class));
+
+
+        //stopService(playerService);
+        //cancelNotification();
+        // }
+
 
         // return default phone mode state
         if (phoneModeHelper != null) {
@@ -123,6 +126,8 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        stopService(new Intent(MainActivity.this, PlayerService.class));
+
         finish();
     }
 
@@ -188,10 +193,9 @@ public class MainActivity extends Activity {
             if (trackList == null) trackList = new TrackList(MainActivity.this, 0);
         }
 
-        if (saveThisObjects != null && saveThisObjects.trackListDialog != null) {
-            trackListDialog = saveThisObjects.trackListDialog;
+        if (saveThisObjects != null) {
+            if (isTrackListDialogShowing) showTrackListDialog();
         }
-
 
 
         // create preferences class
@@ -201,7 +205,6 @@ public class MainActivity extends Activity {
         phoneModeHelper = new PhoneModeHelper(MainActivity.this);
         currentPhoneState = phoneModeHelper.getCurrentMode();
         if (currentPhoneState == PhoneModeHelper.MODE_SILENT) {
-
         }
 
         playerService = new Intent(this, PlayerService.class);
@@ -234,10 +237,41 @@ public class MainActivity extends Activity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.help:
-                //newGame();
+                AlertDialog.Builder helpDialog = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.menu_help_title)
+                        .setMessage(R.string.menu_help_message)
+                        .setIcon(R.drawable.menu_help)
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                helpDialog.show();
                 return true;
             case R.id.about:
-               // showHelp();
+                AlertDialog.Builder aboutDialog = new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.menu_about_title)
+                        .setMessage(R.string.menu_about_message)
+                        .setIcon(R.drawable.menu_help)
+                        .setPositiveButton(R.string.button_visit, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK));
+                                startActivity(browserIntent);
+
+                                //if (Build.VERSION.SDK_INT == 10)
+                               /* final Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_LINK));
+                                MainActivity.this.startActivity(intent);*/
+                            }
+                        })
+                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                aboutDialog.show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -473,50 +507,56 @@ public class MainActivity extends Activity {
         }
     }
 
-    class ButtonShowTrackListOnClickListener implements View.OnClickListener {
-        @Override
-        public void onClick(View view) {
-            trackListDialog = new AlertDialog.Builder(MainActivity.this);
-            trackListDialog.setCancelable(true);
-            //trackListDialog.setIcon(R.drawable.ic_launcher);
-            //trackListDialog.setTitle(R.string.select_track);
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_item);
-            //final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
+
+    private void showTrackListDialog() {
+        AlertDialog.Builder trackListDialog = new AlertDialog.Builder(MainActivity.this);
+        //trackListDialog.setCancelable(true);
+        //trackListDialog.setIcon(R.drawable.ic_launcher);
+        //trackListDialog.setTitle(R.string.select_track);
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_item);
+        //final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.select_dialog_singlechoice);
 
 
-            for (HashMap<String, String> map : songsList) {
-                arrayAdapter.add(map.get("songTitle"));
-            }
+        for (TrackList.Track track : trackList.getTracks(MainActivity.this)) {
+            arrayAdapter.add(track.title);
+        }
             /*for (Track track : trackList.getTracks()) {
                 arrayAdapter.add(track.title);
             }*/
 
-            trackListDialog.setNegativeButton(R.string.cancel,
-                    new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
+        trackListDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                isTrackListDialogShowing = false;
+            }
+        });
 
-            int checkedItem = 0;//trackList.getCurrentTrackNum();
-            trackListDialog.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    String strName = arrayAdapter.getItem(i);
+        trackListDialog.setNegativeButton(R.string.cancel,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+        int checkedItem = 0;//trackList.getCurrentTrackNum();
+        trackListDialog.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String strName = arrayAdapter.getItem(i);
                   /*  trackList.setCurrentTrack(strName);
 
                     TrackList.Track track = trackList.getCurrentTrack();
 */
-                    playerService = new Intent(MainActivity.this, PlayerService.class);
-                    playerService.putExtra("songIndex", i);
-                    startService(playerService);
+                playerService = new Intent(MainActivity.this, PlayerService.class);
+                playerService.putExtra("songIndex", i);
+                startService(playerService);
 
-                    //player.createPlayer(track, true);
+                //player.createPlayer(track, true);
 
-                    dialogInterface.dismiss();
-                }
-            });
+                dialogInterface.dismiss();
+            }
+        });
         /*    trackListDialog.setSingleChoiceItems(arrayAdapter, checkedItem, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
@@ -535,7 +575,14 @@ public class MainActivity extends Activity {
                 }
             });*/
 
-            trackListDialog.show();
+        trackListDialog.show();
+        isTrackListDialogShowing = true;
+    }
+
+    class ButtonShowTrackListOnClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            showTrackListDialog();
         }
     }
 
@@ -667,7 +714,7 @@ public class MainActivity extends Activity {
 
         saveThisObjects.offTimerCount = offTimerCount;
         saveThisObjects.trackList = trackList;
-        saveThisObjects.trackListDialog = trackListDialog;
+        saveThisObjects.isTrackListDialogShowing = isTrackListDialogShowing;
 
         return saveThisObjects;
     }
@@ -678,6 +725,6 @@ public class MainActivity extends Activity {
 
         public int offTimerCount;
         public TrackList trackList;
-        public AlertDialog.Builder trackListDialog;
+        public boolean isTrackListDialogShowing;
     }
 }
