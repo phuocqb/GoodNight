@@ -1,4 +1,4 @@
-package ru.pisklenov.android.GoodNight.util;
+package ru.pisklenov.android.GoodNight.play;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -32,6 +32,8 @@ import java.util.Random;
 import ru.pisklenov.android.GoodNight.GN;
 import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.activity.MainActivity;
+import ru.pisklenov.android.GoodNight.util.TrackList;
+import ru.pisklenov.android.GoodNight.util.Utilities;
 
 public class PlayerService extends Service implements MediaPlayer.OnCompletionListener,
         View.OnClickListener, SeekBar.OnSeekBarChangeListener {

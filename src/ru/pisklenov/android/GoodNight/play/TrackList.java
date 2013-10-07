@@ -1,4 +1,4 @@
-package ru.pisklenov.android.GoodNight.util;
+package ru.pisklenov.android.GoodNight.play;
 
 import android.content.Context;
 
