@@ -10,6 +10,7 @@ import android.media.AudioManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -66,23 +67,24 @@ public class MainActivity extends Activity {
     ImageView imageViewWallpaper;
     TextView textViewOffTimer;
 
+    private Handler handler = new Handler();
 
     public static TrackList trackList;
     //Player player;
     //AlertDialog.Builder trackListDialog = null;
     boolean isTrackListDialogShowing = false;
 
-    OffTimerTask offTimerTask;
+    //OffTimerTask offTimerTask;
     UpdateWallpapersTask updateWallpapersTask;
 
     PreferencesHelper preferencesHelper;
     PhoneModeHelper phoneModeHelper;
 
     int currentPhoneState;
-    int offTimerCount = 0;
+    int offTimerCount = -1;
 
     // Songs list
-    public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+    //public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
     public Intent playerService;
 
 
@@ -179,9 +181,11 @@ public class MainActivity extends Activity {
 
 
         SaveThisObjects saveThisObjects = (SaveThisObjects) getLastNonConfigurationInstance();
-        if (saveThisObjects != null && saveThisObjects.offTimerCount != 0) {
-            offTimerTask = new OffTimerTask(saveThisObjects.offTimerCount);
-            offTimerTask.execute();
+        if (saveThisObjects != null && saveThisObjects.offTimerCount >= 0) {
+            offTimerCount = saveThisObjects.offTimerCount;
+
+            handler.postDelayed(mUpdateTimeTask, 1000);
+            //new OffTimerTask().execute(saveThisObjects.offTimerCount);
         }
 
         if (saveThisObjects != null && saveThisObjects.trackList != null) {
@@ -305,13 +309,63 @@ public class MainActivity extends Activity {
     }*/
 
 
-    class OffTimerTask extends AsyncTask<Void, Void, Void> implements Serializable {
-        OffTimerTask(int secondCounter) {
-            offTimerCount = secondCounter;
-        }
 
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            if (Thread.interrupted()) return;
+
+            offTimerCount--;
+            if (offTimerCount < 0) return;
+
+            if (offTimerCount == 0) {
+                if (textViewOffTimer != null) {
+                    textViewOffTimer.setVisibility(View.INVISIBLE);
+                }
+
+                stopService(new Intent(MainActivity.this, PlayerService.class));
+
+                finish();
+            }
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (textViewOffTimer != null) {
+                        if (DEBUG) Log.d(TAG, "textViewOffTimer != null");
+                        textViewOffTimer.setVisibility(View.VISIBLE);
+
+                        int min = offTimerCount / 60;
+                        int sec = offTimerCount - 60 * min;
+                        textViewOffTimer.setText(min + ":" + sec);
+                    }
+
+                    if (offTimerCount < 10 &&
+                            VolumeHelper.getCurrentVolumeInPercent(MainActivity.this) > VolumeHelper.MEDIUM_VOLUME_PERCENT) {
+                        VolumeHelper.setMediumVolume(MainActivity.this);
+                    }
+
+                    if (offTimerCount < 5 &&
+                            VolumeHelper.getCurrentVolumeInPercent(MainActivity.this) > VolumeHelper.LOW_VOLUME_PERCENT) {
+                        VolumeHelper.setLowVolume(MainActivity.this);
+                    }
+                }
+            });
+
+            handler.postDelayed(this, 1000);
+            // if (DEBUG) Log.d("AndroidBuildingMusicPlayerActivity","Runable  progressbar");
+        }
+    };
+
+
+
+    /*class OffTimerTask extends AsyncTask<Integer, Void, Void> {
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Void doInBackground(Integer... values) {
+            //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
+            Log.i(TAG, "OffTimerTask doInBackground");
+            offTimerCount = values[0];
+
             while (!isCancelled()) {
                 try {
                     publishProgress();
@@ -325,6 +379,8 @@ public class MainActivity extends Activity {
                 } catch (InterruptedException e) {
                     return null;
                 }
+
+                Log.i(TAG, "OFFTimer work");
             }
             return null;
         }
@@ -334,11 +390,10 @@ public class MainActivity extends Activity {
             if (DEBUG) Log.d(TAG, "OffTimerTask " + offTimerCount);
 
             //TextView tmp_textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
-            if (textViewOffTimer != null && textViewOffTimer.getVisibility() != View.VISIBLE) {
-                textViewOffTimer.setVisibility(View.VISIBLE);
-            }
-
             if (textViewOffTimer != null) {
+                if (DEBUG) Log.d(TAG, "textViewOffTimer != null");
+                textViewOffTimer.setVisibility(View.VISIBLE);
+
                 int min = offTimerCount / 60;
                 int sec = offTimerCount - 60 * min;
                 textViewOffTimer.setText(min + ":" + sec);
@@ -369,7 +424,7 @@ public class MainActivity extends Activity {
             finish();
         }
     }
-
+*/
     /* class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -408,6 +463,8 @@ public class MainActivity extends Activity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+
             while (!isCancelled()) {
                 try {
                     TimeUnit.SECONDS.sleep(1);
@@ -464,26 +521,29 @@ public class MainActivity extends Activity {
         public void onIconContextItemSelected(MenuItem item, Object info) {
             if (DEBUG) Log.d(TAG, "onContextItemSelected");
 
-            if (offTimerTask != null) {
-                offTimerTask.cancel(true);
+            if (textViewOffTimer != null) {
                 textViewOffTimer.setVisibility(View.INVISIBLE);
             }
 
             switch (item.getItemId()) {
                 case R.id.timer_off:
-                    //
+                    offTimerCount = -1;
                     break;
                 case R.id.timer_10:
-                    offTimerTask = new OffTimerTask(10*60);
-                    offTimerTask.execute();
+                    offTimerCount = 600;
+                    handler.postDelayed(mUpdateTimeTask, 1000);
+                    //new OffTimerTask().execute(600);
+                    //Log.i(TAG, "R.id.timer_10");
                     break;
                 case R.id.timer_20:
-                    offTimerTask = new OffTimerTask(20*60);
-                    offTimerTask.execute();
+                    offTimerCount = 1200;
+                    handler.postDelayed(mUpdateTimeTask, 1000);
+                    //new OffTimerTask().execute(1200);
                     break;
                 case R.id.timer_30:
-                    offTimerTask = new OffTimerTask(30*60);
-                    offTimerTask.execute();
+                    offTimerCount = 1800;
+                    handler.postDelayed(mUpdateTimeTask, 1000);
+                    //new OffTimerTask().execute(1800);
                     break;
                 default:
                     ;
