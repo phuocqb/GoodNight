@@ -152,7 +152,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                             mp.pause();
                             // Changing button image to play button
                             btnPlay.get().setImageResource(R.drawable.button_play);
-                            Log.d(TAG, "Pause");
+                            if (DEBUG) Log.d(TAG, "Pause");
 
                         }
                     } else {
@@ -161,7 +161,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                             mp.start();
                             // Changing button image to button_pause button
                             btnPlay.get().setImageResource(R.drawable.button_pause);
-                            Log.d(TAG, "Play");
+                            if (DEBUG) Log.d(TAG, "Play");
                         }
                     }
                 } else {
@@ -172,7 +172,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
             case R.id.imageButtonNext:
                 // check if button_next song is there or not
-                Log.d(TAG, "Next");
+                if (DEBUG) Log.d(TAG, "Next");
 
 
                 if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {
@@ -420,7 +420,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         //Remove progress bar update Hanlder callBacks
         progressBarHandler.removeCallbacks(mUpdateTimeTask);
 
-        Log.d(TAG, "Player Service Stopped");
+        if (DEBUG) Log.d(TAG, "Player Service Stopped");
         if (mp != null) {
             if (mp.isPlaying()) {
                 mp.stop();
@@ -480,12 +480,12 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
             // Updating progress bar
             int progress = (int) (utils.getProgressPercentage(currentDuration, totalDuration));
-            // Log.d("Progress", ""+progress);
+            // if (DEBUG) Log.d("Progress", ""+progress);
             songProgressBar.get().setProgress(progress);
 
             // Running this thread after 100 milliseconds
             progressBarHandler.postDelayed(this, 500);
-            // Log.d("AndroidBuildingMusicPlayerActivity","Runable  progressbar");
+            // if (DEBUG) Log.d("AndroidBuildingMusicPlayerActivity","Runable  progressbar");
         }
     };
 }

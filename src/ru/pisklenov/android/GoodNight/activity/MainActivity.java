@@ -2,16 +2,13 @@ package ru.pisklenov.android.GoodNight.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -39,7 +36,6 @@ import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
 import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
-import ru.pisklenov.android.GoodNight.play.Player;
 import ru.pisklenov.android.GoodNight.play.PlayerService;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
 import ru.pisklenov.android.GoodNight.play.TrackList;
@@ -205,8 +201,11 @@ public class MainActivity extends Activity {
         // create control mode class
         phoneModeHelper = new PhoneModeHelper(MainActivity.this);
         currentPhoneState = phoneModeHelper.getCurrentMode();
-        if (currentPhoneState == PhoneModeHelper.MODE_SILENT) {
+
+        if (preferencesHelper.getBoolean("PhoneModeSilent", true)) {
+            phoneModeHelper.setModeSilent();
         }
+
 
         playerService = new Intent(this, PlayerService.class);
         playerService.putExtra("songIndex", PlayerService.currentSongIndex);
@@ -428,7 +427,7 @@ public class MainActivity extends Activity {
 
         @Override
         protected void onProgressUpdate(Void... voids) {
-            Log.d(TAG, "UpdateWallpapersTask.onProgressUpdate");
+            if (DEBUG) Log.d(TAG, "UpdateWallpapersTask.onProgressUpdate");
 
             int newWallpaperID = WallpaperList.getRandWallpaperID(prevResID);
 
@@ -443,18 +442,19 @@ public class MainActivity extends Activity {
     class PhoneControlIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
         @Override
         public void onIconContextItemSelected(MenuItem item, Object info) {
-            Log.d(TAG, "onContextItemSelected");
+            if (DEBUG) Log.d(TAG, "onContextItemSelected");
 
             switch (item.getItemId()) {
-                case R.id.phone_control_mute_on:
+                case R.id.phone_control_silent_on:
+                    preferencesHelper.setBoolean("PhoneModeSilent", true);
                     phoneModeHelper.setModeSilent();
                     break;
-                case R.id.phone_control_mute_off:
+                case R.id.phone_control_silent_off:
+                    preferencesHelper.setBoolean("PhoneModeSilent", false);
                     phoneModeHelper.setModeNormal();
                     break;
 
-                default:
-                    ;
+                default: ;
             }
         }
     }
@@ -462,7 +462,7 @@ public class MainActivity extends Activity {
     class TimerIconContextMenuSelectedListener implements IconContextMenu.IconContextItemSelectedListener {
         @Override
         public void onIconContextItemSelected(MenuItem item, Object info) {
-            Log.d(TAG, "onContextItemSelected");
+            if (DEBUG) Log.d(TAG, "onContextItemSelected");
 
             if (offTimerTask != null) {
                 offTimerTask.cancel(true);
@@ -639,8 +639,7 @@ public class MainActivity extends Activity {
 
                         for (final TrackList.DownloadedTrackItem downloadedTrackItem : downloadedTrackItems) {
                             if (preferencesHelper.getString(downloadedTrackItem.md5, null) != null) {
-                                if (DEBUG)
-                                    Log.i(TAG, "file already exist = " + downloadedTrackItem.md5);
+                                if (DEBUG) Log.i(TAG, "file already exist = " + downloadedTrackItem.md5);
                                 continue;
                             }
 

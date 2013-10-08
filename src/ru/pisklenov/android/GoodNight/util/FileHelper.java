@@ -25,7 +25,7 @@ public class FileHelper {
         try {
             InputStream in = context.getResources().openRawResource(resID);
 
-            //Log.e(TAG, context.getFilesDir() + "/" + fileName);
+            //if (DEBUG) Log.e(TAG, context.getFilesDir() + "/" + fileName);
 
             FileOutputStream out = new FileOutputStream(fileName);
             byte[] buff = new byte[1024];

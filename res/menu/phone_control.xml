@@ -3,11 +3,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:icon="@drawable/phone_mute"
-        android:id="@+id/phone_control_mute_on"
+        android:id="@+id/phone_control_silent_on"
         android:title="@string/phone_control_mute_on"/>
 
     <item
         android:icon="@drawable/phone_normal"
-        android:id="@+id/phone_control_mute_off"
+        android:id="@+id/phone_control_silent_off"
         android:title="@string/phone_control_mute_off" />
 </menu>

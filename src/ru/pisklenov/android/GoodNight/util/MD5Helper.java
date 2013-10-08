@@ -18,22 +18,23 @@ import ru.pisklenov.android.GoodNight.activity.MainActivity;
  * Created by anpi0413 on 27.09.13.
  */
 public class MD5Helper {
+    private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
     public static boolean checkMD5(String md5, File updateFile) {
         if (md5 == null || md5.equals("") || updateFile == null) {
-            Log.e(TAG, "MD5 String NULL or UpdateFile NULL");
+            if (DEBUG) Log.e(TAG, "MD5 String NULL or UpdateFile NULL");
             return false;
         }
 
         String calculatedDigest = calculateMD5(updateFile);
         if (calculatedDigest == null) {
-            Log.e(TAG, "calculatedDigest NULL");
+            if (DEBUG) Log.e(TAG, "calculatedDigest NULL");
             return false;
         }
 
-        Log.i(TAG, "Calculated digest: " + calculatedDigest);
-        Log.i(TAG, "Provided digest: " + md5);
+        if (DEBUG) Log.i(TAG, "Calculated digest: " + calculatedDigest);
+        if (DEBUG) Log.i(TAG, "Provided digest: " + md5);
 
         return calculatedDigest.equalsIgnoreCase(md5);
     }
@@ -43,7 +44,7 @@ public class MD5Helper {
         try {
             digest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
-            Log.e(TAG, "Exception while getting Digest", e);
+            if (DEBUG) Log.e(TAG, "Exception while getting Digest", e);
             return null;
         }
 
@@ -51,7 +52,7 @@ public class MD5Helper {
         try {
             is = new FileInputStream(updateFile);
         } catch (FileNotFoundException e) {
-            Log.e(TAG, "Exception while getting FileInputStream", e);
+            if (DEBUG) Log.e(TAG, "Exception while getting FileInputStream", e);
             return null;
         }
 
@@ -73,7 +74,7 @@ public class MD5Helper {
             try {
                 is.close();
             } catch (IOException e) {
-                Log.e(TAG, "Exception on closing MD5 input stream", e);
+                if (DEBUG) Log.e(TAG, "Exception on closing MD5 input stream", e);
             }
         }
     }

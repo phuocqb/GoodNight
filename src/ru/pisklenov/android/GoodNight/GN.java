@@ -10,7 +10,7 @@ import org.acra.annotation.ReportsCrashes;
 //@ReportsCrashes(formKey = "YOUR_FORM_KEY")
 public class GN extends Application {
     public static final String TAG = "GoodNight";
-    public static final boolean DEBUG = true;
+    public static final boolean DEBUG = false;
 
     @Override
     public void onCreate() {
