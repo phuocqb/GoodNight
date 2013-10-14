@@ -139,7 +139,9 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         // TODO Auto-generated method stub
 
         songProgressBar = new WeakReference<SeekBar>(MainActivity.seekBar);
-        songProgressBar.get().setOnSeekBarChangeListener(this);
+        try {
+            songProgressBar.get().setOnSeekBarChangeListener(this);
+        } catch (Exception e) {}
     }
 
     public void onClick(View v) {

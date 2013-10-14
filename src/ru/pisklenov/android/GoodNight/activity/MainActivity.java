@@ -48,7 +48,12 @@ public class MainActivity extends Activity {
     private static final String TAG = GN.TAG;
 
     private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
-    private static final String MARKET_LINK = "market://search?q=pub:Andrei Pisklenov";
+    private static final String MARKET_LINK = "samsungapps://ProductDetail/";
+
+/*    private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
+    private static final String MARKET_LINK = "market://search?q=pub:Andrei Pisklenov";*/
+
+
     //private static final String GOOGLE_PLAY_LINK = "market://search?q=pub:Andrei Pisklenov";
 
     public static ImageButton imageButtonPlay;
@@ -258,26 +263,28 @@ public class MainActivity extends Activity {
                         .setTitle(R.string.menu_about_title)
                         .setMessage(R.string.menu_about_message)
                         .setIcon(R.drawable.menu_help)
-                        .setPositiveButton(R.string.button_visit, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK));
                                 startActivity(browserIntent);*/
 
-                                try {
-                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(MARKET_LINK)));
+                                dialogInterface.dismiss();
+
+                                /*try {
+                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(MARKET_LINK + MainActivity.this.getPackageName())));
                                 } catch (android.content.ActivityNotFoundException e) {
                                     startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_LINK)));
-                                }
+                                }*/
 
                             }
                         })
-                        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        /*.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.dismiss();
                             }
-                        });
+                        })*/;
                 aboutDialog.show();
                 return true;
             default:
