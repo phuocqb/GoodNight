@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Good night, little Mozart</string>
+
+    <string name="menu_timer_off_title">Автовыключение музыки</string>
+    <string name="timer_off">Отмена</string>
+    <string name="timer_10">Выключить через 10 мин</string>
+    <string name="timer_20">Выключить через 20 мин</string>
+    <string name="timer_30">Выключить через 30 мин</string>
+
+    <string name="menu_about_title">О приложении</string>
+    <string name="menu_about_message">Good night, little Mozart \nAuthor and developer: Pisklenov Andrei \nInspiration: Pisklenova Marina \nIf you like it, try our other apps </string>
+    <string name="button_visit">Другие наши приложения...</string>
+
+    <string name="menu_help_title">Помощь</string>
+    <string name="menu_help_message">Application \"Good night, little Mozart\" is always ready to help you together with such famous composers as Mozart, Bach, Beethoven, Vivaldi and Brahms.  Calming and relaxing classical music will give your baby the best dreams, full of joy, love, peace and warm-heartedness. Bring up your child to love musical masterpieces and enjoy world\'s cultural heritage. Who knows, maybe one day he will write his own symphony!</string>
+
+    <string name="menu_phone_control_title">What to do with incoming calls</string>
+    <string name="phone_control_mute_on">Mute incoming calls</string>
+    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling with no sound</string>
+
+
+    <string name="select_track">Select track</string>
+
+    <string name="wolfgang_amadeus_mozart_twinkle">Wolfgang Amadeus Mozart - Variations (Twinkle, Twinkle)</string>
+    <string name="johann_sebastian_bach_minuet_in_g">Johann Sebastian Bach - Minuet in G from Anna Magdalena</string>
+    <string name="wolfgang_amadeus_mozart_piano_sonata_in_c">Wolfgang Amadeus Mozart - Piano Sonata in C</string>
+    <string name="johann_pachelbel_canon">Johann Pachelbel - Canon</string>
+    <string name="ludwig_van_beethoven_sonata_no_14">Ludwig van Beethoven - Sonata No. 14</string>
+    <string name="antonin_dvorak_symphony_no_9">Antonin Dvorak - Symphony No. 9, New World</string>
+    <string name="antonio_vivaldi_winter">Antonio Vivaldi - The Four Seasons \'Winter\'</string>
+    <string name="johann_sebastian_bach_suite_no_3">Johann Sebastian Bach - Orchestral Suite No. 3 In D</string>
+    <string name="ludwig_van_beethoven_sonata_no_8">Ludwig van Beethoven - Sonata No. 8, Op. 13 \'Pathetique\'</string>
+    <string name="robert_schumann_kinderscene_op_15">Robert Schumann - Kinderscene Op. 15</string>
+    <string name="johannes_brahms_waltz_no_15">Johannes Brahms - Waltz No. 15</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="default_string_value">--</string>
+</resources>

@@ -7,13 +7,14 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,9 +24,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import ru.pisklenov.android.GoodNight.GN;
@@ -33,19 +32,22 @@ import ru.pisklenov.android.GoodNight.R;
 import ru.pisklenov.android.GoodNight.iconcontext.IconContextMenu;
 import ru.pisklenov.android.GoodNight.internet.Download;
 import ru.pisklenov.android.GoodNight.internet.InternetHelper;
+import ru.pisklenov.android.GoodNight.play.PlayerService;
+import ru.pisklenov.android.GoodNight.play.TrackList;
 import ru.pisklenov.android.GoodNight.util.BitmapHelper;
 import ru.pisklenov.android.GoodNight.util.FileHelper;
 import ru.pisklenov.android.GoodNight.util.MD5Helper;
 import ru.pisklenov.android.GoodNight.util.PhoneModeHelper;
-import ru.pisklenov.android.GoodNight.play.PlayerService;
 import ru.pisklenov.android.GoodNight.util.PreferencesHelper;
-import ru.pisklenov.android.GoodNight.play.TrackList;
 import ru.pisklenov.android.GoodNight.util.VolumeHelper;
 import ru.pisklenov.android.GoodNight.util.WallpaperList;
 
 public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
+
+    static final int SWIPE_MIN_DISTANCE = 120;
+    static final int SWIPE_THRESHOLD_VELOCITY = 70;
 
     private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
     private static final String MARKET_LINK = "samsungapps://ProductDetail/";
@@ -87,6 +89,8 @@ public class MainActivity extends Activity {
 
     int currentPhoneState;
     int offTimerCount = -1;
+
+    int prevResID = 0;
 
     // Songs list
     //public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
@@ -214,6 +218,18 @@ public class MainActivity extends Activity {
         if (preferencesHelper.getBoolean("PhoneModeSilent", true)) {
             phoneModeHelper.setModeSilent();
         }
+
+
+        final GestureDetector gestureDetector = new GestureDetector(new MyGestureDetector());
+        imageViewWallpaper.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (gestureDetector.onTouchEvent(event)) {
+                    return true;
+                }
+                return false;
+            }
+        });
 
 
         playerService = new Intent(this, PlayerService.class);
@@ -466,7 +482,7 @@ public class MainActivity extends Activity {
     class UpdateWallpapersTask extends AsyncTask<Void, Void, Void> {
         static final int CHANGE_WALLPAPER_PERIOD = 10; // 10 second
         int secCounter = 0;
-        int prevResID = 0;
+
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -493,13 +509,18 @@ public class MainActivity extends Activity {
         protected void onProgressUpdate(Void... voids) {
             if (DEBUG) Log.d(TAG, "UpdateWallpapersTask.onProgressUpdate");
 
-            int newWallpaperID = WallpaperList.getRandWallpaperID(prevResID);
-
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), newWallpaperID);
-            BitmapHelper.ImageViewAnimatedChange(MainActivity.this, imageViewWallpaper, bitmap);
-
-            prevResID = newWallpaperID;
+            changeWallpaper();
         }
+    }
+
+
+    private void changeWallpaper() {
+        int newWallpaperID = WallpaperList.getRandWallpaperID(prevResID);
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), newWallpaperID);
+        BitmapHelper.ImageViewAnimatedChange(MainActivity.this, imageViewWallpaper, bitmap);
+
+        prevResID = newWallpaperID;
     }
 
 
@@ -775,6 +796,45 @@ public class MainActivity extends Activity {
         }
     }*/
 
+
+    // detect swipe to left or to right
+    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
+        //this is click!
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            return super.onSingleTapConfirmed(e);
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            if (DEBUG) Log.w(TAG, "velocityX " + Math.abs(velocityX));
+            if (DEBUG) Log.w(TAG, "e1.getX() - e2.getX() " + (int) (e1.getX() - e2.getX()));
+
+            // right to left swipe
+            if ((e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE || e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE)
+                    && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY) {
+                if (DEBUG) Log.w(TAG, "Swipe X !!!");
+
+                changeWallpaper();
+            }
+
+            if ((e1.getY() - e2.getY() > SWIPE_MIN_DISTANCE || e2.getY() - e1.getY() > SWIPE_MIN_DISTANCE)
+                    && Math.abs(velocityY) > SWIPE_THRESHOLD_VELOCITY) {
+                if (DEBUG) Log.w(TAG, "Swipe Y !!!");
+
+                changeWallpaper();
+            }
+
+            return false;
+        }
+    }
+
+
     @Override
     public Object onRetainNonConfigurationInstance() {
         SaveThisObjects saveThisObjects = new SaveThisObjects();
@@ -797,4 +857,8 @@ public class MainActivity extends Activity {
         public TrackList trackList;
         public boolean isTrackListDialogShowing;
     }
+
+
+
+
 }
