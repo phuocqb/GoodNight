@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Good night, little Mozart</string>
+    <string name="app_name">Спи спокойно, маленький Моцарт</string>
 
     <string name="menu_timer_off_title">Автовыключение музыки</string>
     <string name="timer_off">Отмена</string>
@@ -9,33 +9,34 @@
     <string name="timer_30">Выключить через 30 мин</string>
 
     <string name="menu_about_title">О приложении</string>
-    <string name="menu_about_message">Good night, little Mozart \nAuthor and developer: Pisklenov Andrei \nInspiration: Pisklenova Marina \nIf you like it, try our other apps </string>
+    <string name="menu_about_message">"Спи спокойно, маленький Моцарт" \nАвтор и разработчик: Пискленов Андрей \nИдейный вдохновитель: Пискленова Алиса \nОцените наши другие приложения </string>
     <string name="button_visit">Другие наши приложения...</string>
 
     <string name="menu_help_title">Помощь</string>
-    <string name="menu_help_message">Application \"Good night, little Mozart\" is always ready to help you together with such famous composers as Mozart, Bach, Beethoven, Vivaldi and Brahms.  Calming and relaxing classical music will give your baby the best dreams, full of joy, love, peace and warm-heartedness. Bring up your child to love musical masterpieces and enjoy world\'s cultural heritage. Who knows, maybe one day he will write his own symphony!</string>
+    <string name="menu_help_message">Приложение "Спи спокойно, маленький Моцарт" всегда готово прийти к вам на помощь при укладывании вашего малыша вместе с произведениями Моцарта, Баха, Бетховена, Вивальди и Брамса. Успокаивающая и расслабляющая классическая музыка подарит вашему малышу волшебные сны, полные счастья, радости, любви и теплоты.
+    Прививайте ребенку любовь к шедеврам классики с рождения. Кто знает, может, однажды он напишет собственную прекрасную симфонию!</string>
 
-    <string name="menu_phone_control_title">What to do with incoming calls</string>
-    <string name="phone_control_mute_on">Mute incoming calls</string>
-    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling with no sound</string>
+    <string name="menu_phone_control_title">Настройка входящих вызовов</string>
+    <string name="phone_control_mute_on">Перевести устройство в беззвучный режим</string>
+    <string name="phone_control_mute_off">Я жду важный звонок, нужно оставить звук</string>
 
 
-    <string name="select_track">Select track</string>
+    <string name="select_track">Выбрать мелодию</string>
 
-    <string name="wolfgang_amadeus_mozart_twinkle">Wolfgang Amadeus Mozart - Variations (Twinkle, Twinkle)</string>
-    <string name="johann_sebastian_bach_minuet_in_g">Johann Sebastian Bach - Minuet in G from Anna Magdalena</string>
-    <string name="wolfgang_amadeus_mozart_piano_sonata_in_c">Wolfgang Amadeus Mozart - Piano Sonata in C</string>
-    <string name="johann_pachelbel_canon">Johann Pachelbel - Canon</string>
-    <string name="ludwig_van_beethoven_sonata_no_14">Ludwig van Beethoven - Sonata No. 14</string>
-    <string name="antonin_dvorak_symphony_no_9">Antonin Dvorak - Symphony No. 9, New World</string>
-    <string name="antonio_vivaldi_winter">Antonio Vivaldi - The Four Seasons \'Winter\'</string>
-    <string name="johann_sebastian_bach_suite_no_3">Johann Sebastian Bach - Orchestral Suite No. 3 In D</string>
-    <string name="ludwig_van_beethoven_sonata_no_8">Ludwig van Beethoven - Sonata No. 8, Op. 13 \'Pathetique\'</string>
+    <string name="wolfgang_amadeus_mozart_twinkle">Вольфганг Амадей Моцарт - Вариация (Twinkle, Twinkle)</string>
+    <string name="johann_sebastian_bach_minuet_in_g">Иоганн Себастьян Бах - Менуэт (соль мажор) №4 из Нотной тетради Анны Магдалены</string>
+    <string name="wolfgang_amadeus_mozart_piano_sonata_in_c">Вольфганг Амадей Моцарт - Соната для фортепиано (до мажор)</string>
+    <string name="johann_pachelbel_canon">Пахельбель Иоганн - Пушка</string>
+    <string name="ludwig_van_beethoven_sonata_no_14">Людвиг Ван Бетховен - Симфония №14 (Лунная соната)</string>
+    <string name="antonin_dvorak_symphony_no_9">Антонин Дворжак - Симфония №9 («Из Нового Света»)</string>
+    <string name="antonio_vivaldi_winter">Антонио Вивальди - Времена года \'Зима\'</string>
+    <string name="johann_sebastian_bach_suite_no_3">Иоганн Себастьян Бах - Сюита для оркестра №3 (ре мажор)</string>
+    <string name="ludwig_van_beethoven_sonata_no_8">Людвиг Ван Бетховен - Соната №8 op.13 \'Патетическая\'</string>
     <string name="robert_schumann_kinderscene_op_15">Robert Schumann - Kinderscene Op. 15</string>
     <string name="johannes_brahms_waltz_no_15">Johannes Brahms - Waltz No. 15</string>
 
     <string name="ok">OK</string>
-    <string name="cancel">Cancel</string>
+    <string name="cancel">Отмена</string>
 
     <string name="default_string_value">--</string>
 </resources>

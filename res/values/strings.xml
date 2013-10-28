@@ -17,7 +17,7 @@
 
     <string name="menu_phone_control_title">What to do with incoming calls</string>
     <string name="phone_control_mute_on">Mute incoming calls</string>
-    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s calling with no sound</string>
+    <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s call with sound</string>
 
 
     <string name="select_track">Select track</string>

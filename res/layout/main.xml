@@ -80,6 +80,16 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/imageButtonPrev"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_toLeftOf="@+id/imageButtonPlay"
+        android:background="@drawable/style_button_background_selector"
+        android:src="@drawable/button_previous" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/imageButtonPlay"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
@@ -99,12 +109,11 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageButtonPrev"
+        android:id="@+id/imageButton"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_toLeftOf="@+id/imageButtonPlay"
-        android:background="@drawable/style_button_background_selector"
-        android:src="@drawable/button_previous" />
+        android:layout_toRightOf="@+id/imageButtonNext"
+        android:background="@drawable/style_button_background_default"
+        android:src="@drawable/button_play" />
 
     <TextView
         android:layout_width="wrap_content"
