@@ -77,11 +77,10 @@ public class MainActivity extends Activity {
     private Handler handler = new Handler();
 
     public static TrackList trackList;
-    //Player player;
-    //AlertDialog.Builder trackListDialog = null;
+    public static boolean isShuffle;
+
     boolean isTrackListDialogShowing = false;
 
-    //OffTimerTask offTimerTask;
     UpdateWallpapersTask updateWallpapersTask;
 
     PreferencesHelper preferencesHelper;
@@ -100,7 +99,21 @@ public class MainActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu, menu);
+
         return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+
+        MenuItem itemShuffle = menu.findItem(R.id.menu_shuffle);
+        if (preferencesHelper.getBoolean("shuffle", false)) {
+            itemShuffle.setTitle(R.string.menu_shuffle_on);
+        } else {
+            itemShuffle.setTitle(R.string.menu_shuffle_off);
+        }
+
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -219,6 +232,8 @@ public class MainActivity extends Activity {
             phoneModeHelper.setModeSilent();
         }
 
+        isShuffle = preferencesHelper.getBoolean("shuffle", false);
+
 
         final GestureDetector gestureDetector = new GestureDetector(new MyGestureDetector());
         imageViewWallpaper.setOnTouchListener(new View.OnTouchListener() {
@@ -261,7 +276,7 @@ public class MainActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.help:
+            case R.id.menu_help:
                 AlertDialog.Builder helpDialog = new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.menu_help_title)
                         .setMessage(R.string.menu_help_message)
@@ -274,7 +289,7 @@ public class MainActivity extends Activity {
                         });
                 helpDialog.show();
                 return true;
-            case R.id.about:
+            case R.id.menu_about:
                 AlertDialog.Builder aboutDialog = new AlertDialog.Builder(MainActivity.this)
                         .setTitle(R.string.menu_about_title)
                         .setMessage(R.string.menu_about_message)
@@ -303,35 +318,21 @@ public class MainActivity extends Activity {
                         })*/;
                 aboutDialog.show();
                 return true;
+
+            case R.id.menu_shuffle:
+                if (preferencesHelper.getBoolean("shuffle", false)) {
+                    preferencesHelper.setBoolean("shuffle", false);
+                    isShuffle = false;
+                } else {
+                    preferencesHelper.setBoolean("shuffle", true);
+                    isShuffle = true;
+                }
+
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    /*private Player getPlayer() {
-        Player player = new Player(MainActivity.this);
-
-        player.createPlayer(trackList.getCurrentTrack(), false);
-
-        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                if (DEBUG) Log.i(TAG, "player.OnCompletionListener() go button_next track");
-                imageButtonNext.performClick();
-            }
-        });
-        player.setTrackChangeEventListener(new Player.OnTrackChangeEventListener() {
-            @Override
-            public void onEvent(Object o) {
-                if (DEBUG) Log.i(TAG, "player.OnTrackChangeEventListener() track changed");
-                textViewTitle.setText(((TrackList.Track) o).title);
-            }
-        });
-
-        return player;
-    }*/
-
-
 
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
@@ -380,109 +381,9 @@ public class MainActivity extends Activity {
     };
 
 
-
-    /*class OffTimerTask extends AsyncTask<Integer, Void, Void> {
-        @Override
-        protected Void doInBackground(Integer... values) {
-            //Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-
-            Log.i(TAG, "OffTimerTask doInBackground");
-            offTimerCount = values[0];
-
-            while (!isCancelled()) {
-                try {
-                    publishProgress();
-                    offTimerCount--;
-
-                    if (offTimerCount <= 0) {
-                        return null;
-                    }
-
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    return null;
-                }
-
-                Log.i(TAG, "OFFTimer work");
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... voids) {
-            if (DEBUG) Log.d(TAG, "OffTimerTask " + offTimerCount);
-
-            //TextView tmp_textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
-            if (textViewOffTimer != null) {
-                if (DEBUG) Log.d(TAG, "textViewOffTimer != null");
-                textViewOffTimer.setVisibility(View.VISIBLE);
-
-                int min = offTimerCount / 60;
-                int sec = offTimerCount - 60 * min;
-                textViewOffTimer.setText(min + ":" + sec);
-            }
-
-            if (offTimerCount < 10 &&
-                    VolumeHelper.getCurrentVolumeInPercent(MainActivity.this) > VolumeHelper.MEDIUM_VOLUME_PERCENT) {
-                VolumeHelper.setMediumVolume(MainActivity.this);
-            }
-
-            if (offTimerCount < 5 &&
-                    VolumeHelper.getCurrentVolumeInPercent(MainActivity.this) > VolumeHelper.LOW_VOLUME_PERCENT) {
-                VolumeHelper.setLowVolume(MainActivity.this);
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-            TextView tmp_textViewOffTimer = (TextView) findViewById(R.id.textViewOffTimer);
-            if (tmp_textViewOffTimer != null) {
-                tmp_textViewOffTimer.setVisibility(View.INVISIBLE);
-            }
-
-            stopService(new Intent(MainActivity.this, PlayerService.class));
-
-            finish();
-        }
-    }
-*/
-    /* class UpdateTrackPosTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... voids) {
-            while (!isCancelled()) {
-                try {
-                    publishProgress();
-
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException e) {
-                    return null;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... voids) {
-            //if (Thread.interrupted()) return;
-
-            if (player != null && player.isPlaying()) {
-
-                //Log.d(TAG, String.valueOf(player.getCurrentPosition() + " " + player.getDuration()));
-                //Log.d(TAG, String.valueOf(Math.round(((float)player.getCurrentPosition() / (float)player.getDuration()) * 100)));
-
-                progressBar.setProgress(Math.round(((float) player.getCurrentPosition() / (float) player.getDuration()) * 100));
-            } else {
-                //if (progressBar != null) progressBar.setProgress(0);
-            }
-        }
-    }*/
-
     class UpdateWallpapersTask extends AsyncTask<Void, Void, Void> {
         static final int CHANGE_WALLPAPER_PERIOD = 10; // 10 second
         int secCounter = 0;
-
 
         @Override
         protected Void doInBackground(Void... voids) {

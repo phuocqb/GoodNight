@@ -62,6 +62,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
         utils = new Utilities();
 
         trackList = MainActivity.trackList;
+        isShuffle = MainActivity.isShuffle;
         //songsListingSD = MainActivity.songsList;
 
         songCurrentDurationLabel = new WeakReference<TextView>(MainActivity.textViewSongCurrentDuration);
@@ -176,32 +177,44 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                 // check if button_next song is there or not
                 if (DEBUG) Log.d(TAG, "Next");
 
+                if (isShuffle) {
 
-                if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {
-                //if (currentSongIndex < (songsListingSD.size() - 1)) {
-                    playSong(currentSongIndex + 1);
-                    currentSongIndex = currentSongIndex + 1;
+                    // shuffle is on - play a menu_random song
+                    Random rand = new Random();
+                    currentSongIndex = rand.nextInt(trackList.getTracks(getApplicationContext()).size());
+                    playSong(currentSongIndex);
+
                 } else {
-                    // play first song
-                    playSong(0);
-                    currentSongIndex = 0;
+                    if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {
+                        currentSongIndex = currentSongIndex + 1;
+                        playSong(currentSongIndex);
+
+                    } else {
+                        // play first song
+                        currentSongIndex = 0;
+                        playSong(currentSongIndex);
+                    }
                 }
+
+
                 break;
 
             case R.id.imageButtonPrev:
+                if (isShuffle) {
+                    // shuffle is on - play a menu_random song
+                    Random rand = new Random();
+                    currentSongIndex = rand.nextInt(trackList.getTracks(getApplicationContext()).size());
+                    playSong(currentSongIndex);
 
-                if (currentSongIndex > 0) {
-                    playSong(currentSongIndex - 1);
-                    currentSongIndex = currentSongIndex - 1;
                 } else {
-                    // play last song
-
-
-                    playSong(trackList.getTracks(getApplicationContext()).size() - 1);
-                    currentSongIndex = trackList.getTracks(getApplicationContext()).size() - 1;
-
-//                    playSong(songsListingSD.size() - 1);
-//                    currentSongIndex = songsListingSD.size() - 1;
+                    if (currentSongIndex > 0) {
+                        currentSongIndex = currentSongIndex - 1;
+                        playSong(currentSongIndex);
+                    } else {
+                        // play last song
+                        currentSongIndex = trackList.getTracks(getApplicationContext()).size() - 1;
+                        playSong(currentSongIndex);
+                    }
                 }
                 break;
 
@@ -380,7 +393,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
 
     /**
      * On Song Playing completed if repeat is ON play same song again if shuffle
-     * is ON play random song
+     * is ON play menu_random song
      */
     public void onCompletion(MediaPlayer arg0) {
 
@@ -389,28 +402,22 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             // repeat is on play same song again
             playSong(currentSongIndex);
         } else if (isShuffle) {
-            // shuffle is on - play a random song
+
+            // shuffle is on - play a menu_random song
             Random rand = new Random();
-
-
-            currentSongIndex = rand.nextInt((trackList.getTracks(getApplicationContext()).size() - 1) - 0 + 1) + 0;
-            //currentSongIndex = rand.nextInt((songsListingSD.size() - 1) - 0 + 1) + 0;
-
+            currentSongIndex = rand.nextInt(trackList.getTracks(getApplicationContext()).size());
             playSong(currentSongIndex);
+
         } else {
             // no repeat or shuffle ON - play button_next song
 
-
             if (currentSongIndex < (trackList.getTracks(getApplicationContext()).size() - 1)) {
-            //if (currentSongIndex < (songsListingSD.size() - 1)) {
-
-
-                playSong(currentSongIndex + 1);
                 currentSongIndex = currentSongIndex + 1;
+                playSong(currentSongIndex);
             } else {
                 // play first song
-                playSong(0);
                 currentSongIndex = 0;
+                playSong(currentSongIndex);
             }
         }
     }
@@ -419,6 +426,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     public void onDestroy() {
         super.onDestroy();
         currentSongIndex = -1;
+
         //Remove progress bar update Hanlder callBacks
         progressBarHandler.removeCallbacks(mUpdateTimeTask);
 

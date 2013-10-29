@@ -19,6 +19,8 @@
     <string name="phone_control_mute_on">Mute incoming calls</string>
     <string name="phone_control_mute_off">I\'m waiting for an important call, let\'s call with sound</string>
 
+    <string name="menu_shuffle_off">Shuffle off</string>
+    <string name="menu_shuffle_on">Shuffle on</string>
 
     <string name="select_track">Select track</string>
 

@@ -20,6 +20,8 @@
     <string name="phone_control_mute_on">Перевести устройство в беззвучный режим</string>
     <string name="phone_control_mute_off">Я жду важный звонок, нужно оставить звук</string>
 
+    <string name="menu_shuffle_off">По порядку</string>
+    <string name="menu_shuffle_on">В случайном порядке</string>
 
     <string name="select_track">Выбрать мелодию</string>
 
