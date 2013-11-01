@@ -24,7 +24,8 @@
             android:id="@+id/imageButtonTrackList"
             android:layout_alignParentRight="false"
             android:layout_alignParentLeft="true"
-            android:background="@drawable/button_list" />
+            android:background="@drawable/button_list"
+            android:scaleType="fitXY"/>
 
         <TextView
             android:layout_width="fill_parent"
@@ -85,7 +86,8 @@
         android:layout_centerHorizontal="true"
         android:layout_toLeftOf="@+id/imageButtonPlay"
         android:background="@drawable/style_button_background_selector"
-        android:src="@drawable/button_previous" />
+        android:src="@drawable/button_previous"
+        android:scaleType="fitXY"/>
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -94,7 +96,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:background="@drawable/style_button_background_selector"
-        android:src="@drawable/button_play" />
+        android:src="@drawable/button_play"
+        android:scaleType="fitXY"/>
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -104,7 +107,8 @@
         android:layout_centerHorizontal="true"
         android:layout_toRightOf="@+id/imageButtonPlay"
         android:background="@drawable/style_button_background_selector"
-        android:src="@drawable/button_next" />
+        android:src="@drawable/button_next"
+        android:scaleType="fitXY"/>
 
     <TextView
         android:layout_width="wrap_content"

@@ -126,17 +126,6 @@ public class MainActivity extends Activity {
         super.onDestroy();
         if (DEBUG) Log.w(TAG, "MainActivity.onDestroy()");
 
-        //if (!PlayerService.mp.isPlaying()) {
-
-
-        // stopService(new Intent(MainActivity.this, PlayerService.class));
-
-
-        //stopService(playerService);
-        //cancelNotification();
-        // }
-
-
         // return default phone mode state
         if (phoneModeHelper != null) {
             phoneModeHelper.setMode(currentPhoneState);
@@ -684,7 +673,7 @@ public class MainActivity extends Activity {
     }*/
 
 
-    // detect swipe to left or to right
+    // detect fling to left or to right
     private class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
@@ -707,6 +696,13 @@ public class MainActivity extends Activity {
             }
 
             return false;
+        }
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            if (DEBUG) Log.w(TAG, "onDown");
+
+            return super.onDown(e);
         }
     }
 
