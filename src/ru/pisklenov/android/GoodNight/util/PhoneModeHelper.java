@@ -8,9 +8,9 @@ import android.media.AudioManager;
  */
 public class PhoneModeHelper {
     private Context context;
-    public static final int MODE_NORMAL = AudioManager.RINGER_MODE_NORMAL;
-    public static final int MODE_SILENT = AudioManager.RINGER_MODE_SILENT;
-    public static final int MODE_VIBRATE = AudioManager.RINGER_MODE_VIBRATE;
+    private static final int MODE_NORMAL = AudioManager.RINGER_MODE_NORMAL;
+    private static final int MODE_SILENT = AudioManager.RINGER_MODE_SILENT;
+    private static final int MODE_VIBRATE = AudioManager.RINGER_MODE_VIBRATE;
 
 
     public PhoneModeHelper(Context context) {

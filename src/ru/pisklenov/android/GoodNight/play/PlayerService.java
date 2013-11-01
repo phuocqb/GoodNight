@@ -74,6 +74,15 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (DEBUG) Log.w(TAG, " -- PlayerService.onStartCommand()");
 
+        if (intent == null) {
+            if (DEBUG) Log.e(TAG, "PlayerService.onStartCommand() - Intent is died!");
+
+            stopSelf();
+
+            super.onStart(intent, startId);
+            return START_STICKY;
+        }
+
         initUI();
         int songIndex = intent.getIntExtra("songIndex", 0);
         if (songIndex != currentSongIndex) {
@@ -146,8 +155,16 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
     }
 
     public void onClick(View v) {
-        // TODO Auto-generated method stub
+
+        try {
+            isShuffle = MainActivity.isShuffle;
+        } catch (Exception e){}
+
+        if (DEBUG) Log.d(TAG, "isShuffle " + isShuffle);
+
+
         switch (v.getId()) {
+
             case R.id.imageButtonPlay:
                 if (currentSongIndex != -1) {
                     if (mp.isPlaying()) {
@@ -176,6 +193,8 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
             case R.id.imageButtonNext:
                 // check if button_next song is there or not
                 if (DEBUG) Log.d(TAG, "Next");
+
+
 
                 if (isShuffle) {
 
@@ -489,7 +508,7 @@ public class PlayerService extends Service implements MediaPlayer.OnCompletionLi
                     "" + utils.milliSecondsToTimer(currentDuration));
 
             // Updating progress bar
-            int progress = (int) (utils.getProgressPercentage(currentDuration, totalDuration));
+            int progress = utils.getProgressPercentage(currentDuration, totalDuration);
             // if (DEBUG) Log.d("Progress", ""+progress);
             songProgressBar.get().setProgress(progress);
 

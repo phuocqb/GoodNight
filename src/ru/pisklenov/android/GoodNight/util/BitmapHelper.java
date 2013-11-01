@@ -13,6 +13,7 @@ public class BitmapHelper {
     public static void ImageViewAnimatedChange(Context c, final ImageView v, final Bitmap new_image) {
         final Animation anim_out = AnimationUtils.loadAnimation(c, android.R.anim.fade_out);
         final Animation anim_in = AnimationUtils.loadAnimation(c, android.R.anim.fade_in);
+
         anim_out.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {

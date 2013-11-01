@@ -576,8 +576,7 @@ public class MenuBuilder implements Menu {
             return false;
         }
 
-        if (item.hasSubMenu()) {
-        } else {
+        if (!item.hasSubMenu()) {
             if ((flags & FLAG_PERFORM_NO_CLOSE) == 0) {
                 close(true);
             }

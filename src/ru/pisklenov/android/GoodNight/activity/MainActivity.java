@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,17 +47,15 @@ public class MainActivity extends Activity {
     private static final boolean DEBUG = GN.DEBUG;
     private static final String TAG = GN.TAG;
 
-    static final int SWIPE_MIN_DISTANCE = 120;
-    static final int SWIPE_THRESHOLD_VELOCITY = 70;
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 70;
 
-    private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
-    private static final String MARKET_LINK = "samsungapps://ProductDetail/";
+    private static final String GOOGLE_PLAY_WEB_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
+    private static final String GOOGLE_PLAY_MARKET_LINK = "market://search?q=pub:Andrei Pisklenov";
 
-/*    private static final String GOOGLE_PLAY_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
-    private static final String MARKET_LINK = "market://search?q=pub:Andrei Pisklenov";*/
+/*    private static final String GOOGLE_PLAY_WEB_LINK = "http://play.google.com/store/search?q=pub:Andrei Pisklenov";
+    private static final String 2SAMSUNG_MARKET_LINK = "samsungapps://ProductDetail/";*/
 
-
-    //private static final String GOOGLE_PLAY_LINK = "market://search?q=pub:Andrei Pisklenov";
 
     public static ImageButton imageButtonPlay;
     public static ImageButton imageButtonNext;
@@ -68,11 +67,11 @@ public class MainActivity extends Activity {
 
     public static SeekBar seekBar;
 
-    ImageButton imageButtonTimer;
-    ImageButton imageButtonPhoneControl;
-    ImageButton imageButtonTrackList;
-    ImageView imageViewWallpaper;
-    TextView textViewOffTimer;
+    private ImageButton imageButtonTimer;
+    private ImageButton imageButtonPhoneControl;
+    private ImageButton imageButtonTrackList;
+    private ImageView imageViewWallpaper;
+    private TextView textViewOffTimer;
 
     private Handler handler = new Handler();
 
@@ -86,10 +85,9 @@ public class MainActivity extends Activity {
     PreferencesHelper preferencesHelper;
     PhoneModeHelper phoneModeHelper;
 
-    int currentPhoneState;
-    int offTimerCount = -1;
-
-    int prevResID = 0;
+    private int currentPhoneState;
+    private int offTimerCount = -1;
+    private int prevResID = 0;
 
     // Songs list
     //public static ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
@@ -108,9 +106,9 @@ public class MainActivity extends Activity {
 
         MenuItem itemShuffle = menu.findItem(R.id.menu_shuffle);
         if (preferencesHelper.getBoolean("shuffle", false)) {
-            itemShuffle.setTitle(R.string.menu_shuffle_on);
-        } else {
             itemShuffle.setTitle(R.string.menu_shuffle_off);
+        } else {
+            itemShuffle.setTitle(R.string.menu_shuffle_on);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -158,11 +156,6 @@ public class MainActivity extends Activity {
 
         if (DEBUG) Log.w(TAG, "MainActivity.onPause()");
 
-       /* if (updateTrackPosTask != null) {
-            updateTrackPosTask.cancel(true);
-            updateTrackPosTask = null;
-        }*/
-
         if (updateWallpapersTask != null) {
             updateWallpapersTask.cancel(true);
             updateWallpapersTask = null;
@@ -175,9 +168,6 @@ public class MainActivity extends Activity {
 
         if (DEBUG) Log.w(TAG, "MainActivity.onResume()");
 
-        /*updateTrackPosTask = new UpdateTrackPosTask();
-        updateTrackPosTask.execute();
-*/
         updateWallpapersTask = new UpdateWallpapersTask();
         updateWallpapersTask.execute();
     }
@@ -239,10 +229,7 @@ public class MainActivity extends Activity {
         imageViewWallpaper.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                if (gestureDetector.onTouchEvent(event)) {
-                    return true;
-                }
-                return false;
+                return gestureDetector.onTouchEvent(event);
             }
         });
 
@@ -294,28 +281,28 @@ public class MainActivity extends Activity {
                         .setTitle(R.string.menu_about_title)
                         .setMessage(R.string.menu_about_message)
                         .setIcon(R.drawable.menu_help)
-                        .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.button_visit, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_LINK));
-                                startActivity(browserIntent);*/
+                                /*Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_PLAY_WEB_LINK));
+                                startActivity(browserIntent);
 
                                 dialogInterface.dismiss();
-
-                                /*try {
-                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(MARKET_LINK + MainActivity.this.getPackageName())));
+*/
+                                try {
+                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_MARKET_LINK + MainActivity.this.getPackageName())));
                                 } catch (android.content.ActivityNotFoundException e) {
-                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_LINK)));
-                                }*/
+                                    startActivity(new Intent(Intent.ACTION_VIEW).setData(Uri.parse(GOOGLE_PLAY_WEB_LINK)));
+                                }
 
                             }
                         })
-                        /*.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                        .setNegativeButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 dialogInterface.dismiss();
                             }
-                        })*/;
+                        });
                 aboutDialog.show();
                 return true;
 
@@ -440,7 +427,7 @@ public class MainActivity extends Activity {
                     phoneModeHelper.setModeNormal();
                     break;
 
-                default: ;
+                default: /* */ ;
             }
         }
     }
@@ -474,13 +461,12 @@ public class MainActivity extends Activity {
                     handler.postDelayed(mUpdateTimeTask, 1000);
                     //new OffTimerTask().execute(1800);
                     break;
-                default:
-                    ;
+                default: /* */ ;
             }
         }
     }
 
-    class ButtonTimerOnClickListener implements Button.OnClickListener {
+    private class ButtonTimerOnClickListener implements Button.OnClickListener {
         @Override
         public void onClick(View view) {
             IconContextMenu cm = new IconContextMenu(MainActivity.this, R.menu.off_timer);
@@ -490,7 +476,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    class ButtonPhoneControlOnClickListener implements View.OnClickListener {
+    private class ButtonPhoneControlOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             IconContextMenu cm = new IconContextMenu(MainActivity.this, R.menu.phone_control);
@@ -572,14 +558,14 @@ public class MainActivity extends Activity {
         isTrackListDialogShowing = true;
     }
 
-    class ButtonShowTrackListOnClickListener implements View.OnClickListener {
+    private class ButtonShowTrackListOnClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
             showTrackListDialog();
         }
     }
 
-    class DownloadTask extends AsyncTask<Void, Void, Void> {
+    private class DownloadTask extends AsyncTask<Void, Void, Void> {
         static final String HTTPS_DRIVE_GOOGLE_COM = "https://drive.google.com/uc?id=%s&export=download";
         //static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mLWNyNDVNdWFsQ28";
         static final String DRIVE_GOOGLE_MAIN_FILE_ID = "0B96N99jRte7mSUN1R21GYktPRXc";
@@ -699,18 +685,7 @@ public class MainActivity extends Activity {
 
 
     // detect swipe to left or to right
-    class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
-        //this is click!
-        @Override
-        public boolean onSingleTapConfirmed(MotionEvent e) {
-            return super.onSingleTapConfirmed(e);
-        }
-
-        @Override
-        public boolean onDown(MotionEvent e) {
-            return true;
-        }
-
+    private class MyGestureDetector extends GestureDetector.SimpleOnGestureListener {
         @Override
         public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
             if (DEBUG) Log.w(TAG, "velocityX " + Math.abs(velocityX));

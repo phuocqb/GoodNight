@@ -9,7 +9,7 @@
     <string name="timer_30">Turn off after 30 min</string>
 
     <string name="menu_about_title">About</string>
-    <string name="menu_about_message">Good night, little Mozart \nAuthor and developer: Pisklenov Andrei \nInspiration: Pisklenova Marina \nIf you like it, try our other apps </string>
+    <string name="menu_about_message">Good night, little Mozart \nAuthor and developer: Andrei Pisklenov \nInspiration: Alice Pisklenova, my daughter \nIf you like it, try our other apps </string>
     <string name="button_visit">More our apps</string>
 
     <string name="menu_help_title">Help</string>

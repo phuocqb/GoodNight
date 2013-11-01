@@ -39,8 +39,7 @@ public class FileHelper {
                 in.close();
                 out.close();
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 
     public static ArrayList<String> getLinesFromFile(File file) {

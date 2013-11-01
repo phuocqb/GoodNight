@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Спи спокойно, маленький Моцарт</string>
+    <string name="app_name">Спокойной ночи, маленький Моцарт</string>
 
     <string name="menu_timer_off_title">Автовыключение музыки</string>
     <string name="timer_off">Отмена</string>
@@ -9,8 +9,8 @@
     <string name="timer_30">Выключить через 30 мин</string>
 
     <string name="menu_about_title">О приложении</string>
-    <string name="menu_about_message">"Спи спокойно, маленький Моцарт" \nАвтор и разработчик: Пискленов Андрей \nИдейный вдохновитель: Пискленова Алиса \nОцените наши другие приложения </string>
-    <string name="button_visit">Другие наши приложения...</string>
+    <string name="menu_about_message">"Спокойной ночи, маленький Моцарт" \nАвтор и разработчик: Пискленов Андрей \nИдейный вдохновитель: Пискленова Алиса, моя дочь \nОцените наши другие приложения </string>
+    <string name="button_visit">Другие приложения...</string>
 
     <string name="menu_help_title">Помощь</string>
     <string name="menu_help_message">Приложение "Спи спокойно, маленький Моцарт" всегда готово прийти к вам на помощь при укладывании вашего малыша вместе с произведениями Моцарта, Баха, Бетховена, Вивальди и Брамса. Успокаивающая и расслабляющая классическая музыка подарит вашему малышу волшебные сны, полные счастья, радости, любви и теплоты.
@@ -25,19 +25,19 @@
 
     <string name="select_track">Выбрать мелодию</string>
 
-    <string name="wolfgang_amadeus_mozart_twinkle">Вольфганг Амадей Моцарт - Вариация (Twinkle, Twinkle)</string>
+    <string name="wolfgang_amadeus_mozart_twinkle">Вольфганг Амадей Моцарт - Вариация \'Твинкл, Твинкл\'</string>
     <string name="johann_sebastian_bach_minuet_in_g">Иоганн Себастьян Бах - Менуэт (соль мажор) №4 из Нотной тетради Анны Магдалены</string>
     <string name="wolfgang_amadeus_mozart_piano_sonata_in_c">Вольфганг Амадей Моцарт - Соната для фортепиано (до мажор)</string>
-    <string name="johann_pachelbel_canon">Пахельбель Иоганн - Пушка</string>
+    <string name="johann_pachelbel_canon">Иоганн Пахельбель - Канон</string>
     <string name="ludwig_van_beethoven_sonata_no_14">Людвиг Ван Бетховен - Симфония №14 (Лунная соната)</string>
-    <string name="antonin_dvorak_symphony_no_9">Антонин Дворжак - Симфония №9 («Из Нового Света»)</string>
+    <string name="antonin_dvorak_symphony_no_9">Антонин Дворжак - Симфония №9 \'Из Нового Света\'</string>
     <string name="antonio_vivaldi_winter">Антонио Вивальди - Времена года \'Зима\'</string>
     <string name="johann_sebastian_bach_suite_no_3">Иоганн Себастьян Бах - Сюита для оркестра №3 (ре мажор)</string>
     <string name="ludwig_van_beethoven_sonata_no_8">Людвиг Ван Бетховен - Соната №8 op.13 \'Патетическая\'</string>
-    <string name="robert_schumann_kinderscene_op_15">Robert Schumann - Kinderscene Op. 15</string>
-    <string name="johannes_brahms_waltz_no_15">Johannes Brahms - Waltz No. 15</string>
+    <string name="robert_schumann_kinderscene_op_15">Роберт Шуман - Сновидения</string>
+    <string name="johannes_brahms_waltz_no_15">Иоганнес Брамс - Вальс №15</string>
 
-    <string name="ok">OK</string>
+    <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
 
     <string name="default_string_value">--</string>
